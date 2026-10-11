@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KK Youth Profiling System | Login</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root{
+    --yellow:#ffe600;
+    --yellow-dark:#d9c500;
+    --yellow-soft:#3a3600;
+    --black:#0c0c0c;
+    --panel:#151515;
+    --panel-2:#1c1c1c;
+    --line:#2a2a2a;
+    --muted:#8a8880;
+    --white:#f5f5f0;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+    margin:0;
+    height:100%;
+    background:var(--black);
+    color:var(--white);
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.top-strip{
+    height:6px;
+    background:var(--yellow);
+}
+
+.wrap{
+    overflow:hidden;
+    min-height:calc(100vh - 6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 24px;
+}
+
+.auth-card{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    width:100%;
+    max-width:920px;
+}
+
+.form-side{
+    flex:0 1 460px;
+    max-width:460px;
+    background:var(--black);
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:0 30px 70px rgba(0,0,0,.5);
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:48px 50px;
+    position:relative;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:46px;
+}
+
+.brand-badge{
+    width:44px;
+    height:44px;
+    background:var(--yellow);
+    color:#111;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:19px;
+    flex:none;
+}
+
+.brand h5{
+    margin:0;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--white);
+}
+
+.brand small{
+    color:var(--muted);
+    font-size:11px;
+    letter-spacing:.3px;
+}
+
+.form-side h1{
+    font-size:28px;
+    font-weight:800;
+    margin:0 0 8px;
+    line-height:1.2;
+}
+
+.form-side p.sub{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:0 0 26px;
+}
+
+.tabs{
+    display:flex;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:4px;
+    margin-bottom:28px;
+}
+
+.tab-btn{
+    flex:1;
+    background:transparent;
+    border:none;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+}
+
+.tab-btn.active{
+    background:var(--yellow);
+    color:#111;
+}
+
+.tab-btn:not(.active):hover{
+    color:var(--white);
+}
+
+.alert-box{
+    display:none;
+    font-size:12.5px;
+    padding:11px 13px;
+    border-radius:9px;
+    margin-bottom:16px;
+}
+
+.alert-error{
+    background:#3a1414;
+    border:1px solid #5a1f1f;
+    color:#ff9b9b;
+}
+
+.alert-success{
+    background:#14301a;
+    border:1px solid #235c30;
+    color:#9be8ae;
+}
+
+.field{
+    margin-bottom:20px;
+}
+
+.field label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:#c9c7bd;
+    margin-bottom:7px;
+}
+
+.input-shell{
+    position:relative;
+    display:flex;
+    align-items:center;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:11px;
+    transition:border-color .18s ease, background .18s ease;
+}
+
+.input-shell:focus-within{
+    border-color:var(--yellow);
+    background:#1a1a17;
+}
+
+.input-shell i{
+    color:var(--muted);
+    font-size:15px;
+    padding:0 13px;
+    flex:none;
+}
+
+.input-shell input{
+    flex:1;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:var(--white);
+    font-size:14px;
+    padding:13px 14px 13px 0;
+    font-family:inherit;
+}
+
+.input-shell input::placeholder{
+    color:#5c5a53;
+}
+
+.toggle-pw{
+    background:none;
+    border:none;
+    color:var(--muted);
+    padding:0 13px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+.toggle-pw:hover{ color:var(--yellow); }
+
+.row-between{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:2px 0 26px;
+    font-size:12.5px;
+}
+
+.remember{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--muted);
+}
+
+.remember input{ accent-color:var(--yellow); }
+
+.row-between a{
+    color:var(--yellow);
+    text-decoration:none;
+    font-weight:600;
+}
+
+.row-between a:hover{ text-decoration:underline; }
+
+.btn-login{
+    width:100%;
+    background:var(--yellow);
+    color:#111;
+    border:none;
+    border-radius:11px;
+    padding:14px;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.btn-login:hover{
+    background:var(--yellow-dark);
+    box-shadow:0 8px 22px rgba(255,230,0,.18);
+}
+
+.btn-login:active{ transform:translateY(1px); }
+
+.divider{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--muted);
+    font-size:11.5px;
+    margin:26px 0;
+}
+
+.divider::before,.divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+}
+
+.foot-note{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+}
+
+.foot-note strong{
+    color:var(--white);
+    cursor:pointer;
+}
+
+.sys-tag{
+    position:absolute;
+    bottom:28px;
+    left:56px;
+    font-size:10.5px;
+    color:#4d4b45;
+    letter-spacing:.3px;
+}
+
+/* ---------- CHARACTER (side view, facing right) ---------- */
+
+.char{ --cw:clamp(190px,26vw,330px); flex:none; width:var(--cw); margin:0 calc(var(--cw) * -0.165) 34px 0; position:relative; z-index:2; }
+.char svg{ display:block; width:100%; height:auto; overflow:visible; }
+.body{ transform-origin:72px 246px; }
+.thigh{ transform-origin:73px 146px; }
+.shin{ transform-origin:73px 192px; }
+.arm{ transform-origin:76px 94px; }
+.fore{ transform-origin:76px 128px; }
+.head{ transform-origin:76px 76px; }
+.eye{ transform-origin:92px 52px; animation:blink 4.8s infinite; }
+.crossed{ display:none; }
+.shadow-el{ opacity:.35; }
+
+.char{ --a:26deg; --k:50deg; --arm:26deg; --t:.9s; }
+
+@keyframes blink{ 0%,92%,100%{ transform:scaleY(1);} 95%{ transform:scaleY(.1);} }
+@keyframes thigh{ 0%,100%{ transform:rotate(calc(var(--a) * -1)); } 50%{ transform:rotate(var(--a)); } }
+@keyframes shin{ 0%,50%,100%{ transform:rotate(4deg); } 65%{ transform:rotate(var(--k)); } }
+@keyframes swing{ 0%,100%{ transform:rotate(var(--arm)); } 50%{ transform:rotate(calc(var(--arm) * -1)); } }
+@keyframes bob{ 0%,50%,100%{ transform:translateY(0) rotate(var(--lean,3deg)); } 25%,75%{ transform:translateY(-5px) rotate(var(--lean,3deg)); } }
+@keyframes breathe{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-2px);} }
+@keyframes nod{ 0%,100%{ transform:rotate(0);} 50%{ transform:rotate(7deg);} }
+@keyframes reach{ from{ transform:rotate(0);} to{ transform:rotate(-84deg);} }
+
+.walking .body,.pushing .body{ animation:bob var(--t) linear infinite; }
+.walking .thigh,.pushing .thigh{ animation:thigh var(--t) ease-in-out infinite; }
+.walking .shin,.pushing .shin{ animation:shin var(--t) ease-in-out infinite; }
+.walking .arm,.pushing .arm{ animation:swing var(--t) ease-in-out infinite; }
+.leg-b .thigh,.leg-b .shin,.arm-a{ animation-delay:calc(var(--t) / -2) !important; }
+.fore{ transform:rotate(-22deg); transition:transform .35s ease-out; }
+.arm{ transition:transform .35s ease-out; }
+
+.char.pushing{ --a:15deg; --k:22deg; --t:.9s; --lean:15deg; }
+.char.pushing .arm{ animation:reach .45s ease-out forwards !important; }
+.char.pushing .fore{ transform:rotate(0); }
+.char.pushing .head{ transform:rotate(8deg); }
+
+.char.idle .arm{ display:none; }
+.char.idle .crossed{ display:block; }
+.char.idle .body{ animation:breathe 3.6s ease-in-out infinite; }
+.char.nod .head{ animation:nod .35s ease-in-out; }
+
+/* walking in: near hand rests on the hip */
+.char.walking .arm-b{ animation:none !important; transform:rotate(16deg); }
+.char.walking .arm-b .fore{ transform:rotate(-112deg); }
+
+/* after arriving: reacts to the field you're on */
+.char.idle.pose-point .arm,.char.idle.pose-think .arm{ display:block; }
+.char.idle.pose-point .crossed,.char.idle.pose-think .crossed{ display:none; }
+.char.idle .arm-a{ transform:rotate(4deg); }
+.char.idle.pose-point .arm-b{ transform:rotate(var(--pt,-90deg)); }
+.char.idle.pose-point .arm-b .fore{ transform:rotate(0); }
+.char.idle.pose-point .head{ transform:rotate(var(--hd,0deg)); transition:transform .35s ease-out; }
+.char.idle.pose-think .arm-b{ transform:rotate(-70deg); }
+.char.idle.pose-think .arm-b .fore{ transform:rotate(-130deg); }
+.char.idle.pose-think .head{ transform:rotate(4deg); transition:transform .35s ease-out; }
+
+.form-side,.char{ will-change:transform; }
+
+@media (prefers-reduced-motion: reduce){
+    .char *{ animation:none !important; }
+}
+
+@media(max-width:900px){
+    .char{ display:none; }
+    .auth-card{ max-width:460px; }
+    .form-side{ max-width:100%; }
+}
+
+@media(max-width:520px){
+    .wrap{ padding:0; }
+    .auth-card{ min-height:calc(100vh - 6px); }
+    .form-side{ border-radius:0; border:none; min-height:calc(100vh - 6px); }
+}
+</style>
+</head>
+<body>
+
+<div class="top-strip"></div>
+
+<div class="wrap">
+
+    <div class="auth-card">
+
+    <!-- CHARACTER -->
+    <div class="char" id="char">
+        <svg viewBox="0 0 160 260" aria-hidden="true">
+            <ellipse class="shadow-el" cx="76" cy="250" rx="48" ry="7" fill="#000"></ellipse>
+            <g class="body">
+                <!-- far leg + far arm -->
+                <g class="leg-a"><g class="thigh"><rect x="66" y="140" width="15" height="56" rx="7.5" fill="#5d7fc6"></rect>
+                    <g class="shin"><rect x="66" y="186" width="15" height="54" rx="7.5" fill="#5d7fc6"></rect><rect x="64" y="234" width="32" height="13" rx="6.5" fill="#d8d8d0"></rect></g></g></g>
+                <g class="arm arm-a"><rect x="70" y="88" width="12" height="42" rx="6" fill="#d9c500"></rect>
+                    <g class="fore"><rect x="70" y="122" width="12" height="36" rx="6" fill="#6f4529"></rect></g></g>
+
+                <!-- torso + head -->
+                <rect x="58" y="78" width="34" height="70" rx="15" fill="#ffe600"></rect>
+                <rect x="72" y="66" width="12" height="16" rx="5" fill="#8d5a3b"></rect>
+                <g class="head">
+                    <circle cx="76" cy="44" r="27" fill="#1a1a1a"></circle>
+                    <circle cx="84" cy="54" r="19" fill="#8d5a3b"></circle>
+                    <circle cx="102" cy="56" r="3.2" fill="#8d5a3b"></circle>
+                    <g class="eye"><circle cx="92" cy="52" r="2.4" fill="#111"></circle></g>
+                    <path d="M91 65 q4 3 8 0" stroke="#111" stroke-width="1.8" fill="none" stroke-linecap="round"></path>
+                </g>
+
+                <!-- near leg + near arm -->
+                <g class="leg-b"><g class="thigh"><rect x="66" y="140" width="15" height="56" rx="7.5" fill="#6d8fd6"></rect>
+                    <g class="shin"><rect x="66" y="186" width="15" height="54" rx="7.5" fill="#6d8fd6"></rect><rect x="64" y="234" width="32" height="13" rx="6.5" fill="#f5f5f0"></rect></g></g></g>
+                <g class="arm arm-b"><rect x="70" y="88" width="12" height="42" rx="6" fill="#ffe600"></rect>
+                    <g class="fore"><rect x="70" y="122" width="12" height="36" rx="6" fill="#8d5a3b"></rect></g></g>
+                <g class="crossed">
+                    <rect x="60" y="94" width="14" height="30" rx="7" fill="#ffe600"></rect>
+                    <rect x="62" y="108" width="36" height="13" rx="6.5" fill="#8d5a3b"></rect>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-side">
+
+        <div class="brand">
+            <div class="brand-badge"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <h5>KK Youth Profiling</h5>
+                <small>SK BARANGAY SYSTEM</small>
+            </div>
+        </div>
+
+        <h1 id="formTitle">Welcome back</h1>
+        <p class="sub" id="formSub">Sign in to manage youth records, programs, and reports.</p>
+
+        <div class="tabs">
+            <button type="button" class="tab-btn active" id="tabLogin">Log In</button>
+            <button type="button" class="tab-btn" id="tabSignup">Sign Up</button>
+        </div>
+
+        <form id="loginForm">
+
+            <div class="field">
+                <label for="username">Username or email</label>
+                <div class="input-shell">
+                    <i class="bi bi-person"></i>
+                    <input type="text" id="username" placeholder="juan.delacruz" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-shell">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+                    <button type="button" class="toggle-pw" data-target="password" aria-label="Show password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row-between">
+                <label class="remember">
+                    <input type="checkbox" id="remember">
+                    Remember me
+                </label>
+                <a href="#">Forgot password?</a>
+            </div>
+
+            <div id="errorMsg" class="alert-box alert-error">
+                <i class="bi bi-exclamation-circle me-1"></i>
+                <span id="errorText">Invalid username or password.</span>
+            </div>
+
+            <button type="submit" class="btn-login" id="loginBtn">
+                Sign in
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+        <form id="signupForm" style="display:none;">
+
+            <div class="field">
+                <label for="suName">Full name</label>
+                <div class="input-shell">
+                    <i class="bi bi-person-badge"></i>
+                    <input type="text" id="suName" placeholder="Juan A. Dela Cruz" autocomplete="name" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="suUsername">Username</label>
+                <div class="input-shell">
+                    <i class="bi bi-person"></i>
+                    <input type="text" id="suUsername" placeholder="juan.delacruz" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="suEmail">Email</label>
+                <div class="input-shell">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" id="suEmail" placeholder="juan@barangayaguado.gov.ph" autocomplete="email" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="suPassword">Password</label>
+                <div class="input-shell">
+                    <i class="bi bi-lock"></i>
+                    <input type="password" id="suPassword" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required>
+                    <button type="button" class="toggle-pw" data-target="suPassword" aria-label="Show password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="suConfirm">Confirm password</label>
+                <div class="input-shell">
+                    <i class="bi bi-lock-fill"></i>
+                    <input type="password" id="suConfirm" placeholder="Re-enter password" autocomplete="new-password" minlength="6" required>
+                    <button type="button" class="toggle-pw" data-target="suConfirm" aria-label="Show password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="signupError" class="alert-box alert-error"></div>
+            <div id="signupSuccess" class="alert-box alert-success"></div>
+
+            <button type="submit" class="btn-login" id="signupBtn">
+                Create account
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+        <div class="divider">SK BARANGAY AGUADO</div>
+
+        <p class="foot-note">
+            Need access? <strong>Contact your SK Chairman</strong>
+        </p>
+
+        <div class="sys-tag">KK Youth Profiling System • FY 2026–2027</div>
+
+    </div>
+
+        </div>
+
+</div>
+
+<script>
+
+document.querySelectorAll(".toggle-pw").forEach(btn => {
+    btn.addEventListener("click", function(){
+        const target = document.getElementById(this.dataset.target);
+        const icon = this.querySelector("i");
+        const show = target.type === "password";
+        target.type = show ? "text" : "password";
+        icon.classList.toggle("bi-eye", !show);
+        icon.classList.toggle("bi-eye-slash", show);
+    });
+});
+
+/* ---------- TAB SWITCHING ---------- */
+
+const tabLogin    = document.getElementById("tabLogin");
+const tabSignup   = document.getElementById("tabSignup");
+const loginForm   = document.getElementById("loginForm");
+const signupForm  = document.getElementById("signupForm");
+const formTitle   = document.getElementById("formTitle");
+const formSub     = document.getElementById("formSub");
+
+function showLogin(){
+    tabLogin.classList.add("active");
+    tabSignup.classList.remove("active");
+    loginForm.style.display  = "block";
+    signupForm.style.display = "none";
+    formTitle.textContent = "Welcome back";
+    formSub.textContent   = "Sign in to manage youth records, programs, and reports.";
+}
+
+function showSignup(){
+    tabSignup.classList.add("active");
+    tabLogin.classList.remove("active");
+    signupForm.style.display = "block";
+    loginForm.style.display  = "none";
+    formTitle.textContent = "Create an account";
+    formSub.textContent   = "Register to access the SK youth profiling system.";
+}
+
+tabLogin.addEventListener("click", showLogin);
+tabSignup.addEventListener("click", showSignup);
+
+/*
+    DEMO AUTH ONLY — no backend yet.
+    Login checks a hardcoded demo account plus anything created
+    through the Sign Up form, which is saved to localStorage in
+    the browser. Anyone can read this from the page source, so
+    replace this whole block with real server-side auth once you
+    have a backend.
+*/
+const DEMO_ACCOUNTS = [
+    { username: "admin", password: "admin123", name: "Juan A. Dela Cruz", role: "SK CHAIRMAN" }
+];
+
+function getStoredAccounts(){
+    try {
+        return JSON.parse(localStorage.getItem("kkAccounts")) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveStoredAccounts(accounts){
+    localStorage.setItem("kkAccounts", JSON.stringify(accounts));
+}
+
+const errorMsg  = document.getElementById("errorMsg");
+const errorText = document.getElementById("errorText");
+const loginBtn  = document.getElementById("loginBtn");
+
+loginForm.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    const allAccounts = DEMO_ACCOUNTS.concat(getStoredAccounts());
+    const match = allAccounts.find(
+        acc => acc.username.toLowerCase() === username.toLowerCase() && acc.password === password
+    );
+
+    if (!match) {
+        errorText.textContent = "Invalid username or password.";
+        errorMsg.style.display = "block";
+        return;
+    }
+
+    errorMsg.style.display = "none";
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = 'Signing in <i class="bi bi-arrow-repeat"></i>';
+
+    sessionStorage.setItem("kkLoggedIn", "true");
+    sessionStorage.setItem("kkUserName", match.name);
+    sessionStorage.setItem("kkUserRole", match.role || "SK OFFICIAL");
+
+    setTimeout(() => {
+        window.location.href = "dashboard.html";
+    }, 400);
+});
+
+/* ---------- SIGN UP ---------- */
+
+const signupError   = document.getElementById("signupError");
+const signupSuccess = document.getElementById("signupSuccess");
+const signupBtn     = document.getElementById("signupBtn");
+
+signupForm.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    signupError.style.display   = "none";
+    signupSuccess.style.display = "none";
+
+    const name     = document.getElementById("suName").value.trim();
+    const username = document.getElementById("suUsername").value.trim();
+    const email    = document.getElementById("suEmail").value.trim();
+    const password = document.getElementById("suPassword").value;
+    const confirm  = document.getElementById("suConfirm").value;
+
+    function fail(msg){
+        signupError.textContent = msg;
+        signupError.style.display = "block";
+    }
+
+    if (password.length < 6){
+        fail("Password must be at least 6 characters.");
+        return;
+    }
+
+    if (password !== confirm){
+        fail("Passwords do not match.");
+        return;
+    }
+
+    const existing = DEMO_ACCOUNTS.concat(getStoredAccounts());
+    const taken = existing.some(acc => acc.username.toLowerCase() === username.toLowerCase());
+
+    if (taken){
+        fail("That username is already taken.");
+        return;
+    }
+
+    const accounts = getStoredAccounts();
+    accounts.push({ username, password, name, email, role: "SK OFFICIAL" });
+    saveStoredAccounts(accounts);
+
+    signupSuccess.textContent = "Account created. You can now log in.";
+    signupSuccess.style.display = "block";
+
+    signupForm.reset();
+
+    setTimeout(() => {
+        showLogin();
+        document.getElementById("username").value = username;
+        document.getElementById("password").focus();
+    }, 900);
+});
+
+/* ---------- INTRO ANIMATION: walk in, push the form, stand and watch ---------- */
+
+(function(){
+    const card = document.querySelector(".form-side");
+    const char = document.getElementById("char");
+    const small = window.matchMedia("(max-width:900px)").matches;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (still || document.hidden){ char.classList.add("idle"); return; }
+
+    // FAILSAFE: if anything in the intro animation stalls or throws,
+    // the form is forced visible so the login can never stay hidden.
+    function showFormNow(){
+        card.style.transition = "none";
+        card.style.opacity = 1;
+        card.style.transform = "none";
+        char.style.transition = "none";
+        char.style.transform = "none";
+        char.classList.remove("walking", "pushing");
+        char.classList.add("idle");
+    }
+    window.addEventListener("error", showFormNow);
+    setTimeout(function(){
+        if (getComputedStyle(card).opacity < 1 || card.style.transform !== "translateX(0px)" && card.style.transform !== "translateX(0)" && card.style.transform !== "none"){
+            showFormNow();
+        }
+    }, 9000);
+
+    if (small){
+        card.style.opacity = 0;
+        card.style.transform = "translateY(24px)";
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            card.style.transition = "transform .7s ease-out, opacity .7s ease-out";
+            card.style.opacity = 1;
+            card.style.transform = "none";
+        }));
+        setTimeout(() => { card.style.opacity = 1; card.style.transform = "none"; }, 1500);
+        return;
+    }
+
+    const D = 260;   // how far the form waits to the right before it gets pushed
+
+    card.style.opacity = 0;
+    card.style.transform = "translateX(" + (D + 460) + "px)";
+    const startX = -(char.getBoundingClientRect().right + 60);
+    char.style.transform = "translateX(" + startX + "px)";
+
+    const walkDist = D - startX;
+    const walkSecs = Math.max(2.6, walkDist / (char.offsetWidth * 1.2));
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        // 1) character walks in alone
+        char.classList.add("walking");
+        char.style.transition = "transform " + walkSecs + "s linear";
+        char.style.transform = "translateX(" + D + "px)";
+
+        // 2) form slides in from the right while he's on his way
+        setTimeout(() => {
+            card.style.transition = "transform 1.1s cubic-bezier(.2,.8,.3,1), opacity .5s ease";
+            card.style.opacity = 1;
+            card.style.transform = "translateX(" + D + "px)";
+        }, walkSecs * 350);
+
+        // 3) he reaches it and pushes it to the middle
+        setTimeout(() => {
+            char.classList.replace("walking", "pushing");
+            card.style.transition = char.style.transition = "transform 2.6s cubic-bezier(.45,0,.55,1)";
+            card.style.transform = char.style.transform = "translateX(0)";
+        }, walkSecs * 1000 + 50);
+
+        // 4) arms crossed, watching
+        setTimeout(() => {
+            char.classList.replace("pushing", "idle");
+            char.classList.add("pose-cross");
+            card.style.willChange = char.style.willChange = "auto";
+            watch();
+        }, walkSecs * 1000 + 2800);
+    }));
+
+    /* ---------- reacts to what you're doing ---------- */
+
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    let calmTimer;
+
+    function pose(name){
+        char.classList.remove("pose-cross", "pose-point", "pose-think");
+        char.classList.add(name);
+    }
+
+    function calmDown(ms){
+        clearTimeout(calmTimer);
+        calmTimer = setTimeout(() => pose("pose-cross"), ms);
+    }
+
+    function pointAt(el){
+        const r  = char.getBoundingClientRect();
+        const k  = r.width / 160;
+        const sx = r.left + 76 * k, sy = r.top + 94 * k;
+        const t  = el.getBoundingClientRect();
+        const dx = Math.max(40, t.left + 24 - sx);
+        const up = Math.atan2(sy - (t.top + t.height / 2), dx) * 180 / Math.PI;
+        const e  = clamp(up, -55, 70);
+        char.style.setProperty("--pt", (-(90 + e)) + "deg");
+        char.style.setProperty("--hd", (-e * 0.3) + "deg");
+        pose("pose-point");
+        calmDown(1800);
+    }
+
+    function watch(){
+        document.addEventListener("focusin", e => {
+            const el = e.target;
+            if (el.matches && el.matches("input:not([type=checkbox])")) pointAt(el);
+        });
+
+        document.addEventListener("input", () => {
+            pose("pose-think");
+            char.classList.remove("nod");
+            void char.offsetWidth;
+            char.classList.add("nod");
+            calmDown(2600);
+        });
+
+        document.addEventListener("focusout", () => calmDown(1200));
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
