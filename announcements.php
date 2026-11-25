@@ -1,0 +1,2412 @@
+<?php require_once __DIR__ . '/config.php'; require_viewer(); if (is_limited_viewer()) { header('Location: index.php#announcements'); exit; } ?>
+<!DOCTYPE html>
+<html lang="en"<?= is_limited_viewer() ? ' class="is-public"' : '' ?>>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KK Youth Profiling System | Announcements</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+    <link href="sidebar.css?v=32" rel="stylesheet">
+    <script src="theme.js"></script>
+    <script>
+        window.ANN_MODE = "<?= is_limited_viewer() ? 'public' : 'official' ?>";
+        window.ANN_AUTHENTICATED = <?= current_user() ? 'true' : 'false' ?>;
+    </script>
+    <style>
+/* =========================================================
+   ANNOUNCEMENTS PAGE STYLES (announcements.php = official view + public view in ONE file)
+   The first part is the original style of the page, unchanged.
+   ========================================================= */
+:root{
+    --kk-primary:var(--bs-primary);
+    --kk-primary-dark:var(--bs-primary-text-emphasis);
+    --kk-primary-soft:rgba(var(--bs-primary-rgb),.12);
+    --black:var(--bs-body-color);
+    --dark:var(--bs-primary-text-emphasis);
+    --cream:var(--bs-tertiary-bg);
+    --line:var(--bs-border-color);
+    --muted:var(--bs-secondary-color);
+    --white:#ffffff;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bs-tertiary-bg);
+    color:var(--black);
+    font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+a{
+    text-decoration:none;
+}
+
+.top-strip{
+    height:7px;
+    background:var(--bs-primary);
+}
+
+header{
+    background:#fff!important;
+    border-bottom:1px solid var(--line)!important;
+}
+
+header h1{
+    font-weight:900;
+}
+
+.btn-success{
+    --bs-btn-bg:var(--bs-body-color);
+    --bs-btn-border-color:var(--bs-body-color);
+    --bs-btn-hover-bg:var(--kk-primary);
+    --bs-btn-hover-border-color:var(--kk-primary);
+    --bs-btn-hover-color:#fff;
+    --bs-btn-active-bg:var(--bs-body-color);
+    --bs-btn-active-border-color:var(--bs-body-color);
+    --bs-btn-focus-shadow-rgb:255,230,0;
+    font-weight:800;
+}
+
+.btn-outline-success{
+    --bs-btn-color:var(--bs-body-color);
+    --bs-btn-border-color:var(--bs-body-color);
+    --bs-btn-hover-bg:var(--kk-primary);
+    --bs-btn-hover-border-color:var(--kk-primary);
+    --bs-btn-hover-color:#fff;
+    --bs-btn-active-bg:var(--kk-primary);
+    --bs-btn-active-border-color:var(--kk-primary);
+    font-weight:700;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    flex:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+    font-weight:900;
+    border:2px solid var(--bs-body-color);
+}
+
+footer{
+    display:none;
+}
+
+/* ---------- HERO (same style as Dashboard) ---------- */
+.dashboard-hero{
+    position:relative;
+    overflow:hidden;
+    padding:32px;
+    border-radius:28px;
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+    box-shadow:0 16px 35px rgba(31,31,31,.10);
+}
+
+.dashboard-hero:before{
+    content:"";
+    position:absolute;
+    width:280px;
+    height:280px;
+    border-radius:50%;
+    right:-80px;
+    top:-120px;
+    background:var(--bs-primary-text-emphasis);
+    opacity:.08;
+}
+
+.dashboard-hero:after{
+    content:"";
+    position:absolute;
+    width:170px;
+    height:170px;
+    border-radius:38px;
+    right:145px;
+    bottom:-105px;
+    background:#fff;
+    opacity:.28;
+    transform:rotate(28deg);
+}
+
+.hero-copy{
+    position:relative;
+    z-index:2;
+    max-width:610px;
+}
+
+.hero-copy h2{
+    font-size:clamp(1.8rem,3vw,3rem);
+    font-weight:950;
+    letter-spacing:-1px;
+}
+
+.hero-copy p{
+    max-width:560px;
+    color:var(--bs-primary-text-emphasis);
+}
+
+.hero-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 13px;
+    border-radius:999px;
+    background:var(--bs-primary-text-emphasis);
+    color:#fff;
+    font-size:.78rem;
+    font-weight:800;
+}
+
+/* ---------- TOOLBAR (search + filters) ---------- */
+.toolbar-box{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:0 8px 20px rgba(20,20,20,.045);
+    padding:16px;
+}
+
+.toolbar-box .form-control,
+.toolbar-box .input-group-text{
+    border-color:var(--bs-border-color);
+    background:#fff;
+}
+
+.toolbar-box .form-control:focus{
+    border-color:var(--bs-body-color);
+    box-shadow:0 0 0 3px rgba(var(--bs-primary-rgb),.28);
+}
+
+.filter-pill{
+    border:1px solid var(--bs-body-color);
+    background:#fff;
+    color:var(--bs-body-color);
+    font-weight:700;
+    font-size:.85rem;
+    padding:.4rem .95rem;
+    border-radius:999px;
+    transition:.2s ease;
+}
+
+.filter-pill:hover{
+    background:var(--kk-primary-soft);
+}
+
+.filter-pill.active{
+    background:var(--bs-primary-text-emphasis);
+    color:var(--kk-primary);
+}
+
+.filter-pill .count{
+    display:inline-block;
+    min-width:20px;
+    margin-left:4px;
+    padding:0 6px;
+    border-radius:999px;
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+    font-size:.72rem;
+    font-weight:800;
+}
+
+/* ---------- ANNOUNCEMENT CARD ---------- */
+.ann-card{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(20,20,20,.05);
+    transition:.2s ease;
+}
+
+.ann-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 28px rgba(20,20,20,.10);
+}
+
+.ann-banner{
+    position:relative;
+    aspect-ratio:16 / 9;
+    background:var(--bs-primary);
+    overflow:hidden;
+}
+
+.ann-banner img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+}
+
+/* shown when no banner image was uploaded */
+.ann-banner-empty{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+    font-size:3.2rem;
+    position:relative;
+}
+
+.ann-banner-empty:before{
+    content:"";
+    position:absolute;
+    width:200px;
+    height:200px;
+    border-radius:50%;
+    right:-60px;
+    top:-90px;
+    background:var(--bs-primary-text-emphasis);
+    opacity:.08;
+}
+
+.ann-status{
+    position:absolute;
+    left:12px;
+    top:12px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:.74rem;
+    font-weight:800;
+    border:2px solid var(--bs-body-color);
+}
+
+.ann-status.upcoming{
+    background:var(--bs-primary-text-emphasis);
+    color:var(--kk-primary);
+}
+
+.ann-status.ongoing{
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+}
+
+.ann-status.ongoing:before{
+    content:"";
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--bs-primary-text-emphasis);
+}
+
+.ann-status.completed{
+    background:var(--bs-border-color);
+    color:var(--bs-secondary-color);
+    border-color:var(--bs-border-color);
+}
+
+.ann-body{
+    flex:1;
+    padding:18px 18px 8px;
+}
+
+.ann-title{
+    font-size:1.08rem;
+    font-weight:900;
+    line-height:1.3;
+    margin:0 0 6px;
+}
+
+.ann-meta{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.ann-meta-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    font-size:.84rem;
+}
+
+.ann-meta-icon{
+    width:28px;
+    height:28px;
+    flex:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:9px;
+    background:var(--bs-primary);
+    color:var(--bs-body-color);
+    font-size:.85rem;
+}
+
+.ann-meta-row span{
+    padding-top:3px;
+    word-break:break-word;
+}
+
+.ann-footer{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:14px 18px 18px;
+}
+
+.ann-footer .btn-view{
+    flex:1;
+}
+
+/* ---------- EMPTY STATE ---------- */
+.empty-state{
+    text-align:center;
+    background:#fff;
+    border:2px dashed var(--line);
+    border-radius:22px;
+    padding:48px 20px;
+    color:var(--muted);
+}
+
+.empty-state i{
+    font-size:3rem;
+    color:var(--bs-border-color);
+}
+
+/* ---------- MODALS & FORM ---------- */
+.modal-content{
+    border:0;
+    border-radius:22px;
+    overflow:hidden;
+}
+
+.modal-header{
+    background:var(--bs-primary);
+    border-bottom:0;
+}
+
+.modal-title{
+    font-weight:900;
+}
+
+.form-label{
+    font-weight:700;
+    font-size:.85rem;
+}
+
+.form-control,
+.form-select{
+    border:1px solid var(--bs-border-color);
+    border-radius:12px;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:var(--bs-body-color);
+    box-shadow:0 0 0 3px rgba(var(--bs-primary-rgb),.28);
+}
+
+.banner-preview{
+    position:relative;
+    aspect-ratio:16 / 9;
+    border:2px dashed var(--bs-border-color);
+    border-radius:16px;
+    background:var(--bs-tertiary-bg);
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--muted);
+    text-align:center;
+    font-size:.85rem;
+}
+
+.banner-preview img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+}
+
+.banner-preview canvas{
+    width:100%;
+    height:100%;
+    display:block;
+    touch-action:none;
+    cursor:grab;
+}
+.banner-preview canvas.is-dragging{cursor:grabbing}
+
+.detail-banner{
+    aspect-ratio:16 / 9;
+    background:var(--bs-primary);
+    overflow:hidden;
+    position:relative;
+}
+
+.detail-banner img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+}
+
+.detail-text{
+    white-space:pre-line;
+    color:var(--bs-body-color);
+}
+
+.save-toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:2000;
+}
+
+@media(max-width:575px){
+    .dashboard-hero{
+        padding:24px;
+    }
+
+    .ann-title{
+        font-size:1rem;
+    }
+}
+    
+/* =========================================================
+   ANNOUNCEMENT MODULE ADDITIONS (same colors, fonts, radius)
+   ========================================================= */
+.ann-status.cancelled{
+    background:var(--bs-danger-bg-subtle);
+    color:var(--bs-danger);
+    border-color:var(--bs-danger);
+}
+.ann-status.inline{
+    position:static;
+}
+.ann-card.is-cancelled .ann-banner img{
+    filter:grayscale(1);
+}
+.ann-card.is-draft{
+    border-style:dashed;
+}
+.ann-footer{
+    flex-wrap:wrap;
+}
+.section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+}
+.section-head h2{
+    font-size:1.1rem;
+    font-weight:900;
+    margin:0;
+}
+.mini-badge{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:999px;
+    font-size:.68rem;
+    font-weight:800;
+    border:1.5px solid var(--bs-body-color);
+    background:#fff;
+    color:var(--bs-body-color);
+}
+.mini-badge.upcoming{ background:var(--bs-primary-text-emphasis); color:var(--kk-primary); }
+.mini-badge.ongoing{ background:var(--bs-primary); color:var(--bs-body-color); }
+/* details window */
+.cd-panel{
+    background:rgba(var(--bs-primary-rgb),.08);
+    border:1px solid var(--bs-border-color);
+    border-left:4px solid var(--kk-primary);
+    border-radius:14px;
+    padding:14px;
+}
+.ann-countdown{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+.cd-box{
+    min-width:72px;
+    text-align:center;
+    padding:10px 8px;
+    border-radius:14px;
+    background:var(--bs-primary-text-emphasis);
+    color:var(--kk-primary);
+}
+.cd-num{
+    display:block;
+    font-size:1.6rem;
+    font-weight:900;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+}
+.cd-lbl{
+    display:block;
+    font-size:.65rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--bs-border-color);
+}
+.poster-box{
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:var(--bs-tertiary-bg);
+    padding:10px;
+    text-align:center;
+}
+.poster-box img{
+    max-width:100%;
+    max-height:520px;
+    object-fit:contain;
+    border-radius:10px;
+    cursor:zoom-in;
+}
+.banner-preview.poster{
+    aspect-ratio:3 / 4;
+    max-width:260px;
+}
+.banner-preview.poster img{
+    object-fit:contain;
+}
+#posterLightbox{
+    position:fixed;
+    inset:0;
+    z-index:2100;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.88);
+}
+#posterLightbox.d-none{
+    display:none!important;
+}
+#posterLightbox img{
+    max-width:96vw;
+    max-height:92vh;
+    object-fit:contain;
+    border-radius:10px;
+}
+#posterLightbox button{
+    position:absolute;
+    top:14px;
+    right:14px;
+}
+.pub-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+@media(max-width:575px){
+    .header-account-area{
+        min-width:0;
+    }
+
+    .header-logout{
+        width:36px;
+        height:34px;
+        padding:.25rem;
+        font-size:0;
+    }
+
+    .header-logout i{
+        margin-right:0!important;
+        font-size:1rem;
+    }
+
+    .cd-box{ min-width:62px; }
+    .cd-num{ font-size:1.3rem; }
+}
+
+
+/* Add / Edit window: the fields scroll, the header and the buttons stay visible */
+#announcementForm{
+    display:flex;
+    flex-direction:column;
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+}
+#announcementForm .modal-body{
+    overflow-y:auto;
+}
+#announcementForm .modal-footer{
+    flex-shrink:0;
+    background:#fff;
+    border-top:1px solid var(--line);
+}
+    
+/* =========================================================
+   STATUS COLOURS  (Bootstrap colours: easy to tell apart + easy to read)
+   Upcoming = primary (blue)   Ongoing = success (green)
+   Completed = secondary (grey)   Cancelled = danger (red)
+   ========================================================= */
+.filter-pill{
+    --c:var(--bs-dark);
+    --soft:var(--bs-dark-bg-subtle);
+    --ink:var(--bs-dark);
+    display:inline-flex;
+    align-items:center;
+    gap:.45rem;
+    border:2px solid var(--soft);
+    background:var(--bs-white);
+    color:var(--ink);
+    font-weight:700;
+    font-size:.9rem;
+    padding:.45rem .85rem .45rem 1rem;
+    border-radius:999px;
+    transition:.2s ease;
+}
+.filter-pill[data-filter="Upcoming"]{ --c:var(--bs-primary);   --soft:var(--bs-primary-bg-subtle);   --ink:var(--bs-primary-text-emphasis); }
+.filter-pill[data-filter="Ongoing"]{  --c:var(--bs-success);   --soft:var(--bs-success-bg-subtle);   --ink:var(--bs-success-text-emphasis); }
+.filter-pill[data-filter="Completed"]{--c:var(--bs-secondary); --soft:var(--bs-secondary-bg-subtle); --ink:var(--bs-secondary-text-emphasis); }
+.filter-pill[data-filter="Cancelled"]{--c:var(--bs-danger);    --soft:var(--bs-danger-bg-subtle);    --ink:var(--bs-danger-text-emphasis); }
+
+.filter-pill i{
+    color:var(--c);
+    font-size:1.05em;
+}
+.filter-pill:hover{
+    background:var(--soft);
+    border-color:var(--c);
+    transform:translateY(-2px);
+    box-shadow:0 6px 14px rgba(0,0,0,.12);
+}
+.filter-pill.active{
+    background:var(--c);
+    border-color:var(--c);
+    color:var(--bs-white);
+    box-shadow:0 6px 16px rgba(0,0,0,.2);
+}
+.filter-pill.active i{
+    color:var(--bs-white);
+}
+.filter-pill .count{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:26px;
+    height:22px;
+    margin-left:0;
+    padding:0 8px;
+    border-radius:999px;
+    background:var(--soft);
+    color:var(--ink);
+    font-size:.78rem;
+    font-weight:800;
+}
+.filter-pill.active .count{
+    background:var(--bs-white);
+    color:var(--c);
+}
+
+/* status badge on the card banner: solid colour + white text */
+.ann-status{
+    border:2px solid var(--bs-white);
+    color:var(--bs-white);
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+.ann-status.upcoming{  background:var(--bs-primary);   color:var(--bs-white); }
+.ann-status.ongoing{   background:var(--bs-success);   color:var(--bs-white); }
+.ann-status.completed{ background:var(--bs-secondary); color:var(--bs-white); border-color:var(--bs-white); }
+.ann-status.cancelled{ background:var(--bs-danger);    color:var(--bs-white); border-color:var(--bs-white); }
+.ann-status.ongoing:before{
+    background:var(--bs-white);
+    animation:kkPulse 1.4s ease-in-out infinite;
+}
+@keyframes kkPulse{
+    0%,100%{ opacity:1;  transform:scale(1); }
+    50%    { opacity:.45; transform:scale(.7); }
+}
+
+/* countdown box */
+/* small status labels in lists */
+.mini-badge{
+    border:1.5px solid var(--bs-border-color);
+    background:var(--bs-white);
+    color:var(--bs-body-color);
+}
+.mini-badge.upcoming{  background:var(--bs-primary-bg-subtle);   color:var(--bs-primary-text-emphasis);   border-color:var(--bs-primary-border-subtle); }
+.mini-badge.ongoing{   background:var(--bs-success-bg-subtle);   color:var(--bs-success-text-emphasis);   border-color:var(--bs-success-border-subtle); }
+.mini-badge.completed{ background:var(--bs-secondary-bg-subtle); color:var(--bs-secondary-text-emphasis); border-color:var(--bs-secondary-border-subtle); }
+.mini-badge.cancelled{ background:var(--bs-danger-bg-subtle);    color:var(--bs-danger-text-emphasis);    border-color:var(--bs-danger-border-subtle); }
+
+
+/* ---------- OFFICIAL vs PUBLIC view (same page) ---------- */
+html.is-public .hero-copy p{
+    margin-bottom:0!important;
+}
+
+/* Keep the public view focused on content rather than decoration. */
+.dashboard-hero,
+.toolbar-box,
+.ann-card,
+.empty-state,
+.modal-content{
+    border-radius:.5rem;
+    box-shadow:none;
+}
+
+.dashboard-hero:before,
+.dashboard-hero:after,
+.ann-banner-empty:before{
+    display:none;
+}
+
+.ann-card:hover{
+    transform:none;
+    box-shadow:none;
+}
+
+.ann-status,
+.filter-pill{
+    border-radius:.35rem;
+}
+
+html.dark-mode body,
+html.dark-mode .toolbar-box,
+html.dark-mode .ann-card,
+html.dark-mode .empty-state,
+html.dark-mode .modal-content,
+html.dark-mode .toolbar-box .form-control,
+html.dark-mode .toolbar-box .input-group-text{
+    background:var(--bs-body-bg);
+    color:var(--bs-body-color);
+}
+
+html.dark-mode .ann-banner-empty,
+html.dark-mode .ann-banner{
+    background:var(--bs-primary-text-emphasis);
+}
+
+html.dark-mode .toolbar-box .form-control,
+html.dark-mode .toolbar-box .input-group-text,
+html.dark-mode .filter-pill{
+    border-color:var(--bs-border-color);
+}
+
+/* Editorial layout for the announcements feed. All styles stay inside this page. */
+.announcements-main{
+    width:100%;
+    min-height:calc(100vh - 68px);
+    background:var(--dashboard-canvas,#eef4ff);
+    --dashboard-canvas:#eef4ff;
+    --dashboard-card:#fff;
+    --dashboard-outline:#dce7fb;
+    --dashboard-blue:#1558c7;
+    --dashboard-blue-light:#e9f1ff;
+    --dashboard-shadow:0 10px 28px rgba(37,76,151,.08);
+}
+body:not(.dashboard-page) .page-content > main.container-fluid.announcements-main{
+    width:100%;
+    max-width:none;
+    margin:0;
+    padding:1rem!important;
+}
+@media(min-width:992px){
+    body:not(.dashboard-page) .page-content > main.container-fluid.announcements-main{
+        padding:1.5rem!important;
+    }
+}
+html[data-bs-theme="dark"] .announcements-main{
+    --dashboard-canvas:#171d2d;
+    --dashboard-card:#222d40;
+    --dashboard-outline:#35435d;
+    --dashboard-blue:#82aaff;
+    --dashboard-blue-light:#293b58;
+    --dashboard-shadow:0 10px 28px rgba(0,0,0,.2);
+}
+.announcements-welcome{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    min-height:0;
+    padding:1.2rem clamp(1.25rem,3vw,2rem);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:20px;
+    color:#fff;
+    background:linear-gradient(112deg,#1249a8 0%,#1765d6 58%,#4385ec 100%);
+    box-shadow:0 14px 32px rgba(24,78,174,.16);
+}
+.announcements-welcome .hero-copy{max-width:620px}
+.announcements-welcome h2{color:#fff;font-size:clamp(1.35rem,2.4vw,1.9rem)}
+.announcements-welcome p{max-width:620px;color:rgba(255,255,255,.82)}
+.announcements-welcome-action{
+    border:1px solid rgba(255,255,255,.75)!important;
+    border-radius:999px!important;
+    background:#fff!important;
+    color:#1558c7!important;
+    white-space:nowrap;
+}
+.announcements-welcome-action:hover{background:#edf4ff!important;color:#1249a8!important}
+.toolbar-box{
+    padding:1.1rem;
+    border-color:var(--dashboard-outline);
+    border-radius:18px;
+    background:var(--dashboard-card);
+    box-shadow:var(--dashboard-shadow);
+}
+#filterPills{display:flex;flex:1 1 100%;flex-wrap:wrap;justify-content:center;align-items:center;gap:.5rem;min-width:0}
+.filter-pill{border-radius:999px}
+#allAnnouncementsHead{width:100%;margin:0 0 .75rem}
+#allAnnouncementsHead h2{width:100%;font-size:1.1rem}
+#announcementGrid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:1rem;
+    margin:0;
+}
+#announcementGrid>.col{display:flex;min-width:0;padding:0}
+#announcementGrid .ann-card{width:100%;height:100%}
+@media(max-width:767.98px){#announcementGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:479.98px){#announcementGrid{grid-template-columns:minmax(0,1fr)}}
+.ann-card{
+    overflow:visible;
+    border-color:var(--dashboard-outline);
+    border-radius:18px;
+    background:var(--dashboard-card);
+    box-shadow:var(--dashboard-shadow);
+    color:var(--bs-body-color);
+}
+.ann-banner{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    overflow:hidden;
+    border-radius:17px 17px 0 0;
+    background:var(--dashboard-blue-light);
+}
+.ann-banner img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+.ann-card .ann-body{padding:1rem 1.1rem .55rem}
+.mini-badge.completed,.mini-badge.cancelled{background:var(--bs-tertiary-bg);color:var(--bs-secondary-color)}
+.mini-badge.publish{background:var(--dashboard-blue-light);color:var(--dashboard-blue)}
+.mini-badge.publish.draft,.mini-badge.publish.unpublished{background:var(--bs-tertiary-bg);color:var(--bs-secondary-color)}
+.mini-badge.publish.scheduled{background:var(--bs-primary-bg-subtle);color:var(--bs-primary-text-emphasis)}
+.ann-title{
+    display:-webkit-box;
+    overflow:hidden;
+    color:var(--bs-emphasis-color);
+    font-size:1rem;
+    font-weight:700;
+    line-height:1.3;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+}
+.ann-meta{gap:.35rem}
+.ann-meta-row{align-items:center;gap:.45rem;font-size:.78rem}
+.ann-meta-icon{
+    width:1.25rem;
+    height:1.25rem;
+    border-radius:0;
+    background:transparent;
+    color:#000;
+}
+.ann-meta-row span{padding-top:0;color:#000}
+html[data-bs-theme="dark"] .announcements-main .ann-meta-icon,
+html[data-bs-theme="dark"] .announcements-main .ann-meta-row span{
+    color:var(--bs-body-color);
+}
+.ann-footer{
+    justify-content:space-between;
+    gap:.75rem;
+    padding:.75rem 1.1rem 1rem;
+    border-top:1px solid var(--dashboard-outline);
+}
+.ann-organizer{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.ann-organizer small{color:var(--bs-secondary-color);font-size:.68rem}
+.ann-organizer span{
+    overflow:hidden;
+    color:var(--dashboard-blue);
+    font-size:.78rem;
+    font-weight:650;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.ann-footer .btn-view{
+    flex:none;
+    padding:.45rem .75rem;
+    border:1px solid var(--dashboard-blue);
+    border-radius:9px;
+    background:#fff;
+    color:var(--dashboard-blue);
+    font-size:.8rem;
+    font-weight:650;
+    white-space:nowrap;
+}
+.ann-footer .btn-view:hover,.ann-footer .btn-view:focus-visible{
+    border-color:var(--dashboard-blue);
+    background:var(--dashboard-blue);
+    color:#fff;
+}
+.ann-card:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(37,76,151,.13)}
+.ann-card:hover,.ann-card:focus-within{z-index:6}
+.mini-badge.rescheduled{
+    background:var(--dashboard-blue-light);
+    border-color:var(--dashboard-outline);
+    color:var(--dashboard-blue);
+}
+.reschedule-history{
+    padding:.8rem .9rem;
+    border:1px solid var(--dashboard-outline);
+    border-left:4px solid var(--dashboard-blue);
+    border-radius:12px;
+    background:var(--dashboard-blue-light);
+    color:var(--bs-body-color);
+}
+@media(max-width:575px){
+    .announcements-welcome{padding:1.2rem}
+    .ann-footer{gap:.5rem}
+    .ann-footer .btn-view{padding:.4rem .55rem;font-size:.75rem}
+}
+html.dark-mode .announcements-main .ann-card,
+html.dark-mode .announcements-main .toolbar-box{
+    background:var(--dashboard-card)!important;
+    color:var(--bs-body-color);
+    border-color:var(--dashboard-outline)!important;
+}
+html.dark-mode .reschedule-history{background:var(--dashboard-blue-light);color:var(--bs-body-color);border-color:var(--dashboard-outline)}
+</style>
+<?php include __DIR__ . '/init.php'; ?>
+</head>
+
+<body>
+
+<div class="top-strip"></div>
+
+<script>
+window.SK_MEMBER_PORTAL = <?= (($memberFlagUser = current_user()) && ($memberFlagUser['role'] ?? '') === 'KK Member' && !empty($memberFlagUser['legacy_id'])) ? 'true' : 'false' ?>;
+</script>
+<script src="sidebar.js?v=16"></script>
+
+<div class="page-content">
+
+    <!-- OFFICIAL HEADER -->
+    <header class="bg-white border-bottom sticky-top">
+        <div class="d-flex align-items-center gap-2 gap-md-3 px-3 px-lg-4 py-2 py-lg-3">
+
+            <button class="btn btn-outline-success d-lg-none"
+                    type="button"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#sidebar"
+                    aria-controls="sidebar">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+
+            <div>
+                <h1 class="h5 fw-bold mb-0">Announcements</h1>
+                <div class="text-muted small d-none d-sm-block">
+                    News, events, and notices from the SK office
+                </div>
+            </div>
+
+            <div class="ms-auto header-account-area">
+
+                <a href="announcements.php"
+                   class="header-notification"
+                   aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span id="bellCount" class="header-notification-count">0</span>
+                </a>
+
+                <span class="header-avatar"><?= e(uinit()) ?></span>
+
+                <div class="d-none d-md-block header-identity">
+                    <div class="header-identity-name"><?= e(uname()) ?></div>
+                    <div class="header-identity-role"><?= e(strtoupper(urole())) ?></div>
+                </div>
+
+                <a href="<?= is_public() ? 'login.php' : 'logout.php' ?>" class="btn btn-sm header-logout">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    <?= is_public() ? 'Official Login' : 'Logout' ?>
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+    <main class="container-fluid p-3 p-lg-4 announcements-main">
+        <!-- HERO -->
+        <div class="row g-3 mb-4 align-items-stretch">
+            <section class="col-12" aria-labelledby="announcementsWelcomeTitle">
+                <div class="announcements-welcome h-100 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div class="hero-copy">
+                        <h2 class="mb-2" id="announcementsWelcomeTitle">Updates and events for Sikat</h2>
+                        <p class="mb-0">Find upcoming activities and important notices from your SK.</p>
+                    </div>
+                    <div class="admin-only">
+                        <button type="button" class="btn btn-sm announcements-welcome-action px-3" id="openAddBtn">
+                            <i class="bi bi-plus-lg me-2"></i>
+                            Add Announcement
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SEARCH, FILTER, SORT -->
+        <section class="toolbar-box mb-4">
+            <div class="row g-3 align-items-center">
+
+                <div class="col-lg-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="searchInput" class="form-control"
+                               placeholder="Search title, description, venue, or organizer...">
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-2">
+                    <select id="categoryFilter" class="form-select" aria-label="Filter by category">
+                        <option value="">All categories</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-lg-2">
+                    <input type="date" id="dateFilter" class="form-control" aria-label="Filter by event date">
+                </div>
+
+                <div class="col-6 col-lg-2">
+                    <select id="sortSelect" class="form-select" aria-label="Sort announcements">
+                        <option value="soonest">Upcoming soonest</option>
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="updated">Recently updated</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-lg-2<?= is_limited_viewer() ? ' d-none' : '' ?>">
+                    <select id="publishFilter" class="form-select" aria-label="Filter by publishing">
+                        <option value="">Any publishing</option>
+                        <option>Published</option>
+                        <option>Draft</option>
+                        <option>Unpublished</option>
+                        <option>Scheduled</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center" id="filterPills">
+                        <button type="button" class="filter-pill active" data-filter="Upcoming"><i class="bi bi-clock-history"></i>Upcoming<span class="count" id="countUpcoming">0</span></button>
+                        <button type="button" class="filter-pill" data-filter="Ongoing"><i class="bi bi-broadcast"></i>Ongoing<span class="count" id="countOngoing">0</span></button>
+                        <button type="button" class="filter-pill" data-filter="Completed"><i class="bi bi-check-circle-fill"></i>Completed<span class="count" id="countCompleted">0</span></button>
+                        <button type="button" class="filter-pill" data-filter="Cancelled"><i class="bi bi-x-octagon-fill"></i>Cancelled<span class="count" id="countCancelled">0</span></button>
+                        <button type="button" class="filter-pill" data-filter="Rescheduled"><i class="bi bi-calendar2-week"></i>Rescheduled<span class="count" id="countRescheduled">0</span></button>
+                        <button type="button" class="btn btn-sm btn-outline-success" id="resetFiltersBtn">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset filters
+                        </button>
+                        <button type="button" class="filter-pill" data-filter="All"><i class="bi bi-grid-fill"></i>All<span class="count" id="countAll">0</span></button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="section-head announcements-section-head" id="allAnnouncementsHead">
+            <h2 class="h5 fw-bold mb-0"><i class="bi bi-megaphone me-2"></i><span id="resultsTitle">The latest from your SK</span></h2>
+        </div>
+
+        <!-- ANNOUNCEMENT CARDS (filled by JavaScript) -->
+        <section id="announcementGrid"></section>
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state d-none" id="emptyState">
+            <i class="bi bi-megaphone"></i>
+            <h2 class="h5 fw-bold mt-2 mb-1" id="emptyTitle">No announcements yet</h2>
+            <p class="mb-3" id="emptyText">Click “Add Announcement” to post the first one.</p>
+        </div>
+
+    </main>
+</div>
+
+<!-- ================= ADD / EDIT MODAL ================= -->
+<div class="modal fade" id="announcementModal" tabindex="-1" aria-labelledby="formModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h2 class="modal-title h5" id="formModalTitle">Add Announcement</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="announcementForm" novalidate>
+                <div class="modal-body">
+
+                    <input type="hidden" id="annId">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-8">
+                            <label class="form-label" for="annTitle">Announcement Title *</label>
+                            <input type="text" id="annTitle" class="form-control" maxlength="90" placeholder="e.g. Inter-Purok Basketball League">
+                            <div class="invalid-feedback">Please enter a title.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="annCategory">Category *</label>
+                            <select id="annCategory" class="form-select"></select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="annCenters">Additional Centers of Participation</label>
+                            <select id="annCenters" class="form-select" multiple size="4"></select>
+                            <div class="form-text">The primary category above is always included. Select any additional COP areas that apply.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="annDescription">Short Description *</label>
+                            <textarea id="annDescription" class="form-control" rows="2" maxlength="200"
+                                      placeholder="One or two sentences shown on the card"></textarea>
+                            <div class="invalid-feedback">Please enter a short description.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="annDetails">Full Details</label>
+                            <textarea id="annDetails" class="form-control" rows="3"
+                                      placeholder="Requirements, program, reminders..."></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 mb-0 d-none" id="rescheduleHint" role="status">
+                                <i class="bi bi-info-circle me-1"></i>Update the date or time below. The previous schedule will remain visible to everyone.
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="annDate">Event Date *</label>
+                            <input type="date" id="annDate" class="form-control">
+                            <div class="invalid-feedback">Please choose the event date.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="annStart">Start Time *</label>
+                            <input type="time" id="annStart" class="form-control">
+                            <div class="invalid-feedback">Please choose the start time.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="annEnd">End Time</label>
+                            <input type="time" id="annEnd" class="form-control">
+                            <div class="invalid-feedback" id="annEndError">End time must be after the start time.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="annVenue">Venue / Location *</label>
+                            <select id="annVenue" class="form-select"></select>
+                            <div class="invalid-feedback">Please choose the venue.</div>
+                            <div class="d-none mt-2" id="annVenueOtherBox">
+                                <input type="text" id="annVenueOther" class="form-control" maxlength="90" placeholder="Type the venue / location">
+                                <div class="invalid-feedback">Please type the venue.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="annOrganizer">Organizer *</label>
+                            <select id="annOrganizer" class="form-select"></select>
+                            <div class="invalid-feedback">Please choose the organizer.</div>
+                            <div class="d-none mt-2" id="annOrganizerOtherBox">
+                                <input type="text" id="annOrganizerOther" class="form-control" maxlength="90" placeholder="Type the organizer">
+                                <div class="invalid-feedback">Please type the organizer.</div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="annContact">Contact Information</label>
+                            <input type="text" id="annContact" class="form-control" maxlength="120" placeholder="Phone, email, or contact person">
+                        </div>
+
+                        <!-- IMAGES -->
+                        <div class="col-12">
+                            <label class="form-label" for="annBanner">Banner Image (optional)</label>
+                            <input type="file" id="annBanner" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <div class="form-text">JPG, JPEG, PNG or WEBP, up to 5 MB. Drag the image to reposition it and use the slider to zoom before saving.</div>
+                            <div class="text-danger small mt-1 d-none" id="bannerError"></div>
+                            <div class="banner-preview mt-2" id="bannerPreview" style="max-width:420px;">
+                                <span><i class="bi bi-image fs-3 d-block"></i>No banner selected</span>
+                            </div>
+                            <div class="mt-2 d-none" id="bannerCropControls" style="max-width:420px;">
+                                <label class="form-label mb-1" for="bannerZoom">Adjust banner crop</label>
+                                <input type="range" class="form-range" id="bannerZoom" min="1" max="3" step="0.01" value="1">
+                                <div class="form-text">Drag the image to reposition it, or use the slider to zoom.</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger mt-2 d-none" id="removeBannerBtn">
+                                <i class="bi bi-x-lg me-1"></i> Remove banner
+                            </button>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="annEventStatus">Event Status</label>
+                            <select id="annEventStatus" class="form-select">
+                                <option value="Automatic">Automatic (Upcoming, Ongoing, or Completed by date and time)</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <div class="form-text">The status updates by itself. Only choose Cancelled if the event will not happen.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="annPublishDate">Publish Date</label>
+                            <input type="date" id="annPublishDate" class="form-control">
+                            <div class="form-text">Leave empty to publish today. A future date schedules it.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="annNotes">Additional Notes (optional)</label>
+                            <textarea id="annNotes" class="form-control" rows="2" placeholder="Reminders, dress code, what to bring..."></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Cancel</button>
+
+                    <button type="button" class="btn btn-outline-success" id="saveDraftBtn">
+                        <i class="bi bi-file-earmark me-1"></i> <span>Save as Draft</span>
+                    </button>
+
+                    <button type="submit" class="btn btn-success" id="saveBtn">
+                        <i class="bi bi-check-lg me-1"></i> <span>Publish Announcement</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- ================= CONFIRM MODAL (delete / cancel event / unpublish) ================= -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-4 text-center">
+
+                <div class="mb-2" style="font-size:2.5rem;color:var(--bs-danger);" id="confirmIcon">
+                    <i class="bi bi-trash3"></i>
+                </div>
+
+                <h2 class="h5 fw-bold" id="confirmTitle">Delete Announcement?</h2>
+                <p class="text-muted mb-1" id="confirmName"></p>
+                <p class="text-muted mb-4" id="confirmText">This action cannot be undone.</p>
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-outline-success px-4" data-bs-dismiss="modal" id="confirmBackBtn">Cancel</button>
+                    <button type="button" class="btn btn-danger px-4 fw-bold" id="confirmOkBtn">Delete</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SAVED MESSAGE -->
+<div class="save-toast">
+    <div id="saveToast" class="toast align-items-center text-bg-dark border-0" role="status" aria-live="polite" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastText"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="app-alerts.js?v=2"></script>
+<script>
+/* =========================================================
+   ANNOUNCEMENTS CORE  (used by both the official view and the public view)
+   - saves in the MySQL database (app_data table) under "skAnnouncements"
+   - the event status is calculated from the date and time (never typed in by hand)
+   - the mode is chosen at the top of the page:
+     officials get add / edit / delete; public viewers (Continue as Public Viewer) are view only
+   ========================================================= */
+(function () {
+    "use strict";
+
+    var ANN_KEY = "skAnnouncements";
+    var MODE = window.ANN_MODE === "official" ? "official" : "public";
+    var OFFICIAL = MODE === "official";
+    var CATEGORIES = ["Health", "Education", "Economic Empowerment", "Social Inclusion and Equity", "Peace-Building and Security", "Governance", "Active Citizenship", "Environment", "Global Mobility", "Agriculture"];
+    // old saved announcements used the previous category names: map them to a Center of Participation
+    var LEGACY_CATEGORY = { "General": "Governance", "Community": "Active Citizenship", "Youth": "Active Citizenship",
+        "Program": "Education", "Meeting": "Governance", "Event": "Active Citizenship",
+        "Emergency": "Peace-Building and Security", "Other": "Governance" };
+
+    var announcements = [];
+    var currentFilter = "Upcoming";   // All / Upcoming / Ongoing / Completed / Cancelled / Rescheduled
+    var viewingId = null;
+    var lastSig = "";
+    var actions = {};            // official page adds edit / delete / ... here
+
+    function $(id) { return document.getElementById(id); }
+
+    /* ---------- small helpers ---------- */
+    function escapeHtml(text) {
+        return String(text == null ? "" : text)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+    function safeUrl(url) { return /^https?:\/\/\S+$/i.test(url || "") ? url : ""; }
+    function pad2(n) { return String(n).padStart(2, "0"); }
+    function toDate(dateText) {
+        var p = String(dateText || "").split("-");
+        return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+    }
+    function formatDate(dateText) {
+        if (!dateText) return "";
+        return toDate(dateText).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    }
+    function formatTime(t) {
+        if (!t) return "";
+        var parts = t.split(":");
+        var hour = Number(parts[0]);
+        var ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12;
+        if (hour === 0) hour = 12;
+        return hour + ":" + parts[1] + " " + ampm;
+    }
+    function todayISO() {
+        var d = new Date();
+        return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+    }
+    function timeRange(a) {
+        return formatTime(a.startTime) + (a.endTime ? " \u2013 " + formatTime(a.endTime) : "");
+    }
+    function toast(text) {
+        var el = $("saveToast");
+        if (!el) return;
+        $("toastText").textContent = text;
+        bootstrap.Toast.getOrCreateInstance(el, { delay: 2500 }).show();
+    }
+
+    /* ---------- event schedule + automatic status ---------- */
+    function eventStart(a) { return new Date(a.date + "T" + (a.startTime || "00:00") + ":00"); }
+    // no end time = the event lasts until the end of that day
+    function eventEnd(a) { return a.endTime ? new Date(a.date + "T" + a.endTime + ":00") : new Date(a.date + "T23:59:59"); }
+    function getStatus(a, now) {
+        if (a.cancelled) return "Cancelled";          // a manual cancel is never overwritten
+        now = now || new Date();
+        if (now < eventStart(a)) return "Upcoming";
+        if (now <= eventEnd(a)) return "Ongoing";
+        return "Completed";
+    }
+
+    /* ---------- publishing ---------- */
+    function isPublic(a) {
+        return a.publishState === "Published" && (!a.publishDate || a.publishDate <= todayISO());
+    }
+    function canSee(a) { return OFFICIAL || isPublic(a); }
+    function publishLabel(a) {
+        if (a.publishState === "Published" && a.publishDate && a.publishDate > todayISO()) return "Scheduled";
+        return a.publishState;
+    }
+
+    /* ---------- countdown ---------- */
+    function splitDiff(ms) {
+        var s = Math.max(0, Math.floor(ms / 1000));
+        return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
+    }
+    function updateCountdowns() {
+        var now = Date.now();
+        document.querySelectorAll(".cd-live[data-start]").forEach(function (el) {
+            var t = splitDiff(Number(el.dataset.start) - now);
+            el.querySelector('[data-u="d"]').textContent = pad2(t.d);
+            el.querySelector('[data-u="h"]').textContent = pad2(t.h);
+            el.querySelector('[data-u="m"]').textContent = pad2(t.m);
+            el.querySelector('[data-u="s"]').textContent = pad2(t.s);
+        });
+    }
+
+    /* ---------- sample data (official page, first time only) ---------- */
+    function makeBanner(background, shapeColor, accent) {
+        var svg =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">' +
+            '<rect width="640" height="360" fill="' + background + '"/>' +
+            '<circle cx="560" cy="40" r="150" fill="' + shapeColor + '" opacity=".12"/>' +
+            '<rect x="60" y="210" width="200" height="200" rx="44" fill="' + accent + '" opacity=".35" transform="rotate(24 160 310)"/>' +
+            '<rect x="48" y="96" width="280" height="22" rx="11" fill="' + shapeColor + '"/>' +
+            '<rect x="48" y="134" width="190" height="14" rx="7" fill="' + shapeColor + '" opacity=".45"/>' +
+            '<circle cx="470" cy="215" r="46" fill="' + shapeColor + '"/>' +
+            '<circle cx="548" cy="215" r="46" fill="' + accent + '" stroke="' + shapeColor + '" stroke-width="6"/>' +
+            '</svg>';
+        return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+    function sampleAnnouncements() {
+        var now = new Date().toISOString();
+        function base(o) {
+            o.poster = ""; o.contact = ""; o.regLink = ""; o.notes = "";
+            o.cancelled = false; o.rescheduleHistory = []; o.publishState = "Published"; o.publishDate = "";
+            o.createdAt = now; o.updatedAt = now;
+            return o;
+        }
+        return [
+            base({ id: "sample-4", title: "Youth Clean-Up Drive", category: "Environment",
+                description: "Join the SK in cleaning up our barangay. Gloves and trash bags are provided.",
+                details: "Wear comfortable clothes and bring a water bottle.\nVolunteers receive a certificate of participation.",
+                date: "2026-10-20", startTime: "08:00", endTime: "12:00", venue: "Barangay Sikat Covered Court",
+                organizer: "SK Committee on Environment", contact: "SK Office \u2022 0917 000 0000",
+                banner: makeBanner("#9ec5fe", "#212529", "#ffffff") }),
+            base({ id: "sample-1", title: "KK Youth Profiling Week", category: "Governance",
+                description: "All residents aged 15\u201330 are encouraged to complete their KK profiling.",
+                details: "Bring a valid ID or school ID.\nProfiling forms are available at the SK Office.\nWalk-ins are welcome.",
+                date: "2026-10-15", startTime: "09:00", endTime: "16:00", venue: "Barangay Hall, Barangay Sikat",
+                organizer: "SK Barangay Sikat", banner: makeBanner("rgba(13,110,253,.12)", "#212529", "#9ec5fe") }),
+            base({ id: "sample-2", title: "SK Scholarship Applications Open", category: "Education",
+                description: "Submit your requirements at the SK Office until November 15.",
+                details: "Open to qualified KK youth of Barangay Sikat.\nSubmit your requirements at the SK Office during office hours.",
+                date: "2026-11-15", startTime: "08:00", endTime: "17:00", venue: "SK Office, Barangay Hall",
+                organizer: "SK Committee on Education", banner: makeBanner("#212529", "#9ec5fe", "#9ec5fe") }),
+            base({ id: "sample-3", title: "Inter-Purok Basketball League", category: "Health",
+                description: "Team registration is now open. Contact your purok coordinators.",
+                details: "Each purok may register one team.\nContact your purok coordinator for the team list and schedule.",
+                date: "2026-10-24", startTime: "15:00", endTime: "18:00", venue: "Barangay Covered Court",
+                organizer: "SK Committee on Sports", banner: makeBanner("#9ec5fe", "#212529", "#ffffff") })
+        ];
+    }
+
+    /* ---------- load / save (MySQL through storage.js) ---------- */
+    function normalize(a) {
+        if (CATEGORIES.indexOf(a.category) === -1) a.category = LEGACY_CATEGORY[a.category] || "Governance";
+        var centers = Array.isArray(a.centers) ? a.centers.filter(function (center) {
+            return CATEGORIES.indexOf(center) !== -1;
+        }) : [];
+        if (centers.indexOf(a.category) === -1) centers.unshift(a.category);
+        a.centers = CATEGORIES.filter(function (center) { return centers.indexOf(center) !== -1; });
+        a.startTime = a.startTime || a.time || "00:00";      // older records used "time"
+        a.endTime = a.endTime || "";
+        a.contact = a.contact || ""; a.regLink = a.regLink || ""; a.notes = a.notes || "";
+        a.banner = a.banner || ""; a.poster = a.poster || "";
+        a.details = a.details || ""; a.description = a.description || "";
+        a.venue = a.venue || ""; a.organizer = a.organizer || "";
+        a.cancelled = !!a.cancelled;
+        a.rescheduleHistory = (Array.isArray(a.rescheduleHistory) ? a.rescheduleHistory : []).filter(function (entry) {
+            return entry && /^\d{4}-\d{2}-\d{2}$/.test(String(entry.date || ""));
+        }).map(function (entry) {
+            return {
+                date: String(entry.date),
+                startTime: /^\d{2}:\d{2}$/.test(String(entry.startTime || "")) ? String(entry.startTime) : "",
+                endTime: /^\d{2}:\d{2}$/.test(String(entry.endTime || "")) ? String(entry.endTime) : "",
+                changedAt: String(entry.changedAt || "")
+            };
+        });
+        a.publishState = ["Draft", "Published", "Unpublished"].indexOf(a.publishState) === -1 ? "Published" : a.publishState;
+        a.publishDate = a.publishDate || "";
+        a.createdAt = a.createdAt || (a.date + "T00:00:00.000Z");
+        a.updatedAt = a.updatedAt || a.createdAt;
+        delete a.status;      // the status is now calculated automatically
+        delete a.time;
+        return a;
+    }
+    function load() {
+        var saved = DB.getItem(ANN_KEY);
+        if (saved === null) {
+            announcements = OFFICIAL ? sampleAnnouncements() : [];
+            if (OFFICIAL) save();
+            return;
+        }
+        try {
+            announcements = JSON.parse(saved);
+            if (!Array.isArray(announcements)) announcements = [];
+        } catch (e) { announcements = []; }
+        announcements = announcements.filter(function (a) { return a && a.id && a.date; }).map(normalize);
+    }
+    function save() {
+        try {
+            DB.setItem(ANN_KEY, JSON.stringify(announcements));
+            return true;
+        } catch (e) {
+            toast(e && e.message ? e.message : "Could not save the announcement. Please try again.");
+            return false;
+        }
+    }
+    function find(id) { return announcements.filter(function (a) { return a.id === id; })[0]; }
+
+    /* ---------- pieces of HTML ---------- */
+    function placeholder() { return '<div class="ann-banner-empty"><i class="bi bi-megaphone-fill"></i></div>'; }
+    function imgTag(src, alt, extra) {
+        return '<img class="ann-img" loading="lazy" src="' + escapeHtml(src) + '" alt="' + escapeHtml(alt) + '"' + (extra || "") + '>';
+    }
+    function imageOrPlaceholder(a) {
+        var src = a.banner || a.poster;
+        return src ? imgTag(src, "Banner for " + a.title) : placeholder();
+    }
+    function statusBadge(status, inline) {
+        return '<span class="ann-status ' + (inline ? "inline " : "") + status.toLowerCase() + '">' + escapeHtml(status) + '</span>';
+    }
+    function metaRow(icon, text) {
+        return '<div class="ann-meta-row"><div class="ann-meta-icon"><i class="bi ' + icon + '"></i></div><span>' + escapeHtml(text) + '</span></div>';
+    }
+    function buildCard(a) {
+        var pub = publishLabel(a);
+        var details = metaRow("bi-calendar-event", formatDate(a.date));
+        if (a.startTime || a.endTime) details += metaRow("bi-clock", timeRange(a));
+        if (a.venue) details += metaRow("bi-geo-alt", a.venue);
+        var footer = '<div class="ann-organizer"><small>Organized by</small><span>' + escapeHtml(a.organizer || "SK Office") + '</span></div>' +
+            '<button type="button" class="btn btn-view" data-act="view" data-id="' + escapeHtml(a.id) + '">' +
+            '<i class="bi bi-eye me-1"></i> View Details</button>';
+        return '<div class="col"><div class="ann-card' + (a.cancelled ? " is-cancelled" : "") + (OFFICIAL && pub !== "Published" ? " is-draft" : "") + '">' +
+            '<div class="ann-banner">' + imageOrPlaceholder(a) + '</div>' +
+            '<div class="ann-body">' +
+                '<h3 class="ann-title">' + escapeHtml(a.title) + '</h3>' +
+                '<div class="ann-meta">' + details + '</div>' +
+            '</div>' +
+            '<div class="ann-footer">' + footer + '</div>' +
+        '</div></div>';
+    }
+
+    /* ---------- filter / search / sort ---------- */
+    function sortList(list, mode) {
+        var rank = { Ongoing: 0, Upcoming: 1, Completed: 2, Cancelled: 2 };
+        return list.slice().sort(function (a, b) {
+            if (mode === "newest") return b.createdAt.localeCompare(a.createdAt);
+            if (mode === "oldest") return a.createdAt.localeCompare(b.createdAt);
+            if (mode === "updated") return b.updatedAt.localeCompare(a.updatedAt);
+            var sa = getStatus(a), sb = getStatus(b);          // "soonest"
+            if (rank[sa] !== rank[sb]) return rank[sa] - rank[sb];
+            var diff = eventStart(a) - eventStart(b);
+            return rank[sa] === 2 ? -diff : diff;               // finished events: newest first
+        });
+    }
+    function value(id) { var el = $(id); return el ? el.value : ""; }
+
+    // true when the person is searching or using any filter (the sort order does not count)
+    function isFiltering() {
+        return currentFilter !== "All" || value("searchInput").trim() !== "" ||
+               value("categoryFilter") !== "" || value("dateFilter") !== "" || value("publishFilter") !== "";
+    }
+
+    function filteredList() {
+        var search = value("searchInput").trim().toLowerCase();
+        var cat = value("categoryFilter"), date = value("dateFilter"), pub = value("publishFilter");
+        var list = announcements.filter(canSee).filter(function (a) {
+            if (currentFilter === "Rescheduled" && !a.rescheduleHistory.length) return false;
+            if (currentFilter !== "All" && currentFilter !== "Rescheduled" && getStatus(a) !== currentFilter) return false;
+            if (cat && a.category !== cat) return false;
+            if (date && a.date !== date) return false;
+            if (pub && publishLabel(a) !== pub) return false;
+            if (search) {
+                var text = (a.title + " " + a.description + " " + a.details + " " + a.venue + " " + a.organizer +
+                    (a.rescheduleHistory.length ? " rescheduled" : "")).toLowerCase();
+                if (text.indexOf(search) === -1) return false;
+            }
+            return true;
+        });
+        return sortList(list, value("sortSelect") || "soonest");
+    }
+
+    /* ---------- drawing the page ---------- */
+    function setText(id, text) { var el = $(id); if (el) el.textContent = text; }
+
+    function renderCounts() {
+        var visible = announcements.filter(canSee);
+        var c = { Upcoming: 0, Ongoing: 0, Completed: 0, Cancelled: 0, Rescheduled: 0 };
+        visible.forEach(function (a) {
+            c[getStatus(a)]++;
+            if (a.rescheduleHistory.length) c.Rescheduled++;
+        });
+        setText("countAll", visible.length);
+        setText("countUpcoming", c.Upcoming);
+        setText("countOngoing", c.Ongoing);
+        setText("countCompleted", c.Completed);
+        setText("countCancelled", c.Cancelled);
+        setText("countRescheduled", c.Rescheduled);
+        var bell = $("bellCount");
+        if (bell) {
+            var n = visible.filter(function (a) { return a.publishState === "Published" && !a.cancelled; })
+                .filter(function (a) { var s = getStatus(a); return s === "Upcoming" || s === "Ongoing"; }).length;
+            bell.textContent = n;
+            bell.style.display = n === 0 ? "none" : "";
+        }
+    }
+
+    function render() {
+        var shown = filteredList();
+        var filtering = isFiltering();
+        $("announcementGrid").innerHTML = shown.map(buildCard).join("");
+        setText("resultsTitle", filtering
+            ? (currentFilter === "Rescheduled" ? "Rescheduled Announcements" :
+                (currentFilter !== "All" ? currentFilter + " Programs & Activities" : "Search Results")) + " (" + shown.length + ")"
+            : "The latest from your SK");
+        var empty = $("emptyState");
+        empty.classList.toggle("d-none", shown.length > 0);
+        if (shown.length === 0) {
+            var none = announcements.filter(canSee).length === 0;
+            setText("emptyTitle", none ? "No announcements yet" : "No matching announcements");
+            setText("emptyText", none
+                ? (OFFICIAL ? "Click \u201cAdd Announcement\u201d to post the first one." : "Please check back soon for news and events.")
+                : "Try a different search or filter.");
+        }
+        renderCounts();
+        lastSig = signature();
+        updateCountdowns();
+    }
+
+    function signature() {
+        return announcements.map(function (a) {
+            return a.id + getStatus(a) + (canSee(a) ? 1 : 0) + ":" + a.rescheduleHistory.length + ":" + a.date + a.startTime;
+        }).join("|");
+    }
+
+    /* ---------- details window ---------- */
+    function injectModals() {
+        document.body.insertAdjacentHTML("beforeend",
+            '<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailTitle" aria-hidden="true">' +
+              '<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">' +
+                '<button type="button" class="btn-close position-absolute top-0 end-0 m-3 bg-white rounded-circle p-2" style="z-index:5" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                '<div class="modal-body p-0" id="detailBody"></div>' +
+                '<div class="modal-footer" id="detailFooter"></div>' +
+              '</div></div></div>' +
+            '<div id="posterLightbox" class="d-none" role="dialog" aria-label="Event poster">' +
+              '<button type="button" class="btn btn-light" id="closePosterBtn"><i class="bi bi-x-lg me-1"></i> Close</button>' +
+              '<img id="posterFull" alt="Event poster">' +
+            '</div>');
+    }
+
+    function renderDetails(a) {
+        var status = getStatus(a);
+        var html = '<div class="detail-banner">' + imageOrPlaceholder(a) + '</div><div class="p-4">';
+        html += '<div class="d-flex flex-wrap align-items-center gap-2 mb-2">' + statusBadge(status, true) +
+            '<span class="mini-badge">' + escapeHtml(a.category) + '</span>' +
+            (OFFICIAL ? '<span class="mini-badge">' + publishLabel(a) + '</span>' : "") + '</div>';
+        html += '<h2 class="h4 fw-bold mb-3" id="detailTitle">' + escapeHtml(a.title) + '</h2>';
+        if (a.description && a.details) {
+            html += '<p class="detail-text mb-3">' + escapeHtml(a.description) + '</p>';
+        }
+
+        if (status === "Upcoming") {
+            html += '<div class="cd-panel mb-4"><div class="fw-bold small mb-2"><i class="bi bi-hourglass-split me-1"></i>Event starts in:</div>' +
+                '<div class="ann-countdown cd-live" data-start="' + eventStart(a).getTime() + '">' +
+                ["d:Days", "h:Hours", "m:Minutes", "s:Seconds"].map(function (u) {
+                    var p = u.split(":");
+                    return '<div class="cd-box"><span class="cd-num" data-u="' + p[0] + '">00</span><span class="cd-lbl">' + p[1] + '</span></div>';
+                }).join("") + '</div></div>';
+        } else if (status === "Ongoing") {
+            html += '<div class="cd-panel mb-4"><strong><i class="bi bi-broadcast me-1"></i>Happening now</strong>' +
+                (a.endTime ? ' \u2013 ends at ' + formatTime(a.endTime) : ' \u2013 until the end of the day') + '</div>';
+        } else if (status === "Cancelled") {
+            html += '<div class="alert alert-danger"><i class="bi bi-x-octagon me-1"></i>This event has been cancelled.</div>';
+        } else {
+            html += '<div class="cd-panel mb-4 text-muted"><i class="bi bi-check-circle me-1"></i>This event has ended.</div>';
+        }
+
+        if (a.rescheduleHistory.length) {
+            html += '<div class="reschedule-history mb-4"><strong><i class="bi bi-calendar2-week me-1"></i>Rescheduled</strong>' +
+                '<div class="small mt-1">The current schedule is shown below. Previous schedule' + (a.rescheduleHistory.length > 1 ? 's' : '') + ':</div><ul class="small mb-0 mt-1 ps-3">';
+            a.rescheduleHistory.forEach(function (entry) {
+                var previousTime = entry.startTime
+                    ? " \u2022 " + formatTime(entry.startTime) + (entry.endTime ? " \u2013 " + formatTime(entry.endTime) : "")
+                    : "";
+                var previousSchedule = formatDate(entry.date) + previousTime;
+                html += '<li>' + escapeHtml(previousSchedule) + '</li>';
+            });
+            html += '</ul></div>';
+        }
+
+        html += '<div class="row g-3 mb-4">' +
+            '<div class="col-md-6">' + metaRow("bi-calendar-event", formatDate(a.date)) + '</div>' +
+            '<div class="col-md-6">' + metaRow("bi-clock", timeRange(a)) + '</div>' +
+            '<div class="col-md-6">' + metaRow("bi-geo-alt", a.venue) + '</div>' +
+            '<div class="col-md-6">' + metaRow("bi-person-badge", a.organizer) + '</div>' +
+            (a.contact ? '<div class="col-12">' + metaRow("bi-telephone", a.contact) + '</div>' : "") + '</div>';
+
+        html += '<h3 class="h6 fw-bold">About this announcement</h3><p class="detail-text">' + escapeHtml(a.details || a.description) + '</p>';
+        if (a.notes) {
+            html += '<div class="alert alert-warning mt-3 mb-0"><strong>Additional notes</strong><br><span class="detail-text">' + escapeHtml(a.notes) + '</span></div>';
+        }
+        html += '</div>';
+        $("detailBody").innerHTML = html;
+        var id = escapeHtml(a.id);
+        var footer = '<button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Close</button>';
+        if (OFFICIAL) {
+            var live = a.publishState === "Published";
+            footer += '<button type="button" class="btn btn-success" data-act="edit" data-id="' + id + '"><i class="bi bi-pencil-square me-1"></i> Edit details</button>' +
+                (!a.cancelled ? '<button type="button" class="btn btn-outline-success" data-act="reschedule" data-id="' + id + '"><i class="bi bi-calendar2-week me-1"></i> Reschedule</button>' : '') +
+                '<button type="button" class="btn btn-outline-success" data-act="togglePublish" data-id="' + id + '"><i class="bi ' + (live ? "bi-eye-slash" : "bi-cloud-arrow-up") + ' me-1"></i>' + (live ? "Unpublish" : "Publish") + '</button>' +
+                '<button type="button" class="btn btn-outline-success" data-act="toggleCancel" data-id="' + id + '"' + (status === "Completed" ? " disabled" : "") + '><i class="bi ' + (a.cancelled ? "bi-arrow-counterclockwise" : "bi-x-octagon") + ' me-1"></i>' + (a.cancelled ? "Restore event" : "Cancel event") + '</button>' +
+                '<button type="button" class="btn btn-outline-danger" data-act="delete" data-id="' + id + '"><i class="bi bi-trash3 me-1"></i> Delete</button>';
+        }
+        $("detailFooter").innerHTML = footer;
+        updateCountdowns();
+    }
+
+    function openDetails(id) {
+        var a = find(id);
+        if (!a || !canSee(a)) return;
+        viewingId = id;
+        renderDetails(a);
+        bootstrap.Modal.getOrCreateInstance($("detailsModal")).show();
+    }
+    function closeDetails() { bootstrap.Modal.getOrCreateInstance($("detailsModal")).hide(); }
+
+    function closePoster() { $("posterLightbox").classList.add("d-none"); }
+
+    /* ---------- events ---------- */
+    function setFilter(name) {
+        currentFilter = name;
+        document.querySelectorAll("#filterPills .filter-pill").forEach(function (b) {
+            b.classList.toggle("active", b.dataset.filter === name);
+        });
+        render();
+    }
+
+    function init() {
+        load();
+        injectModals();
+        var cat = $("categoryFilter");
+        CATEGORIES.forEach(function (c) { var o = document.createElement("option"); o.value = c; o.textContent = c; cat.appendChild(o); });
+
+        ["searchInput", "categoryFilter", "dateFilter", "sortSelect", "publishFilter"].forEach(function (id) {
+            var el = $(id);
+            if (el) { el.addEventListener("input", render); el.addEventListener("change", render); }
+        });
+        document.querySelectorAll("#filterPills .filter-pill").forEach(function (b) {
+            b.addEventListener("click", function () { setFilter(b.dataset.filter); });
+        });
+        $("resetFiltersBtn").addEventListener("click", function () {
+            ["searchInput", "categoryFilter", "dateFilter", "publishFilter"].forEach(function (id) { var el = $(id); if (el) el.value = ""; });
+            $("sortSelect").value = "soonest";
+            setFilter("All");
+        });
+        document.addEventListener("click", function (e) {
+            if (e.target.closest("#closePosterBtn") || e.target.id === "posterLightbox") { closePoster(); return; }
+            var poster = e.target.closest("img[data-poster]");
+            if (poster) { $("posterFull").src = poster.src; $("posterLightbox").classList.remove("d-none"); return; }
+            var b = e.target.closest("[data-act]");
+            if (!b || b.disabled) return;
+            var act = b.dataset.act, id = b.dataset.id;
+            if (act === "view") openDetails(id);
+            else if (actions[act]) actions[act](id);
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !$("posterLightbox").classList.contains("d-none")) {
+                e.stopPropagation(); closePoster(); return;
+            }
+        }, true);
+
+        // a picture that fails to load never leaves a broken image
+        document.addEventListener("error", function (e) {
+            var img = e.target;
+            if (!img || img.tagName !== "IMG" || !img.classList.contains("ann-img")) return;
+            if (img.dataset.fallback === "remove") {
+                var box = img.closest(".poster-box");
+                if (box) box.remove();
+            } else {
+                img.outerHTML = placeholder();
+            }
+        }, true);
+
+        $("detailsModal").addEventListener("hidden.bs.modal", function () { viewingId = null; });
+
+        // update everything when another tab changes the data
+        window.addEventListener("storage", function (e) {
+            if (e.key === ANN_KEY) { load(); render(); if (viewingId) { var a = find(viewingId); if (a && canSee(a)) renderDetails(a); else closeDetails(); } }
+        });
+
+        // every second: countdowns tick, and statuses change by themselves
+        setInterval(function () {
+            if (signature() !== lastSig) {
+                render();
+                if (viewingId) { var a = find(viewingId); if (a) renderDetails(a); }
+            } else {
+                updateCountdowns();
+            }
+        }, 1000);
+
+        setFilter(currentFilter);
+        var requestedEventId = new URLSearchParams(window.location.search).get("eventId");
+        if (requestedEventId && find(requestedEventId)) openDetails(requestedEventId);
+    }
+
+    window.AnnCore = {
+        mode: MODE, categories: CATEGORIES, actions: actions,
+        get data() { return announcements; },
+        get viewingId() { return viewingId; },
+        find: find, save: save, render: render, toast: toast, esc: escapeHtml,
+        todayISO: todayISO, getStatus: getStatus, openDetails: openDetails, closeDetails: closeDetails
+    };
+
+    document.addEventListener("DOMContentLoaded", init);
+})();
+
+</script>
+
+<script>
+/* =========================================================
+   OFFICIAL TOOLS: add, edit, publish, cancel event, delete
+   (the cards, filters, countdown and details window are in the shared script above)
+   ========================================================= */
+(function () {
+
+    if (window.ANN_MODE !== "official") return;     // public view = view only
+
+    const Core = window.AnnCore;
+    const $ = function (id) { return document.getElementById(id); };
+
+    const formModal    = new bootstrap.Modal($("announcementModal"));
+    const confirmModal = new bootstrap.Modal($("confirmModal"));
+
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;       // 5 MB
+
+    const images = { banner: "" };   // cropped banner saved with the announcement
+    const cropper = {
+        image: null,
+        canvas: null,
+        zoom: 1,
+        focusX: 0.5,
+        focusY: 0.5,
+        dirty: false,
+        loading: false,
+        loadId: 0,
+        objectUrl: "",
+        drag: null
+    };
+    let editingState = "new";                    // new / Draft / Unpublished / Published
+    let reschedulingId = null;
+    let onConfirm = null;                        // what the confirm window does when OK is clicked
+
+    /* ---------- dropdown lists: add or remove choices here ---------- */
+    const VENUES = ["Barangay Hall", "SK Office", "Barangay Covered Court", "Barangay Health Center",
+                    "Barangay Plaza", "School Gym / Campus", "Online (Facebook / Zoom)"];
+    const ORGANIZERS = ["SK Chairman", "SK Secretary", "SK Treasurer", "SK Kagawad"];
+
+    function fillPick(id, list, placeholder) {
+        const sel = $(id);
+        sel.innerHTML = "";
+        [["", placeholder]].concat(list.map(function (t) { return [t, t]; })).concat([["Other", "Other (specify)"]])
+            .forEach(function (p) {
+                const o = document.createElement("option");
+                o.value = p[0]; o.textContent = p[1];
+                sel.appendChild(o);
+            });
+        sel.addEventListener("change", function () { toggleOther(id); });
+    }
+    function toggleOther(id) { $(id + "OtherBox").classList.toggle("d-none", $(id).value !== "Other"); }
+    function getPick(id) { return $(id).value === "Other" ? $(id + "Other").value.trim() : $(id).value; }
+    function setPick(id, value) {
+        const sel = $(id);
+        const known = Array.prototype.some.call(sel.options, function (o) { return o.value === value && value !== "Other"; });
+        $(id + "Other").value = "";
+        if (!value) sel.value = "";
+        else if (known) sel.value = value;
+        else { sel.value = "Other"; $(id + "Other").value = value; }
+        toggleOther(id);
+    }
+    fillPick("annVenue", VENUES, "Select venue / location");
+    fillPick("annOrganizer", ORGANIZERS, "Select organizer");
+
+    // category dropdown (same list as the filter)
+    Core.categories.forEach(function (c) {
+        const o = document.createElement("option");
+        o.value = c; o.textContent = c;
+        $("annCategory").appendChild(o);
+        const extra = document.createElement("option");
+        extra.value = c; extra.textContent = c;
+        $("annCenters").appendChild(extra);
+    });
+
+    /* ---------- pictures: upload, preview, replace, remove ---------- */
+    function showImage(kind) {
+        const box = $(kind + "Preview");
+        const removeBtn = $("removeBannerBtn");
+        if (kind === "banner" && cropper.image) {
+            box.innerHTML = '<canvas id="bannerCropCanvas" aria-label="Drag to reposition the banner image"></canvas>';
+            cropper.canvas = $("bannerCropCanvas");
+            cropper.canvas.width = 864;
+            cropper.canvas.height = 486;
+            attachCropEvents(cropper.canvas);
+            $("bannerCropControls").classList.remove("d-none");
+            $("bannerZoom").value = String(cropper.zoom);
+            removeBtn.classList.remove("d-none");
+            drawCrop();
+        } else if (images[kind]) {
+            box.innerHTML = '<img src="' + images[kind] + '" alt="' + kind + ' preview">';
+            if (kind === "banner") $("bannerCropControls").classList.add("d-none");
+            removeBtn.classList.remove("d-none");
+        } else {
+            box.innerHTML = '<span><i class="bi bi-image fs-3 d-block"></i>No banner selected</span>';
+            if (kind === "banner") $("bannerCropControls").classList.add("d-none");
+            removeBtn.classList.add("d-none");
+        }
+    }
+
+    function imageError(kind, message) {
+        const el = $(kind + "Error");
+        el.textContent = message;
+        el.classList.toggle("d-none", !message);
+    }
+
+    function getCropRect() {
+        const image = cropper.image;
+        const aspect = 16 / 9;
+        let width = image.naturalWidth;
+        let height = image.naturalHeight;
+        if (width / height > aspect) width = height * aspect;
+        else height = width / aspect;
+        width /= cropper.zoom;
+        height /= cropper.zoom;
+        return {
+            x: (image.naturalWidth - width) * cropper.focusX,
+            y: (image.naturalHeight - height) * cropper.focusY,
+            width: width,
+            height: height
+        };
+    }
+
+    function drawCrop() {
+        if (!cropper.canvas || !cropper.image) return;
+        const context = cropper.canvas.getContext("2d");
+        if (!context) {
+            imageError("banner", "The banner preview could not be displayed.");
+            return;
+        }
+        const crop = getCropRect();
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, cropper.canvas.width, cropper.canvas.height);
+        context.drawImage(
+            cropper.image,
+            crop.x, crop.y, crop.width, crop.height,
+            0, 0, cropper.canvas.width, cropper.canvas.height
+        );
+    }
+
+    function attachCropEvents(canvas) {
+        canvas.addEventListener("pointerdown", function (event) {
+            if (!cropper.image) return;
+            event.preventDefault();
+            cropper.drag = {
+                pointerId: event.pointerId,
+                x: event.clientX,
+                y: event.clientY,
+                focusX: cropper.focusX,
+                focusY: cropper.focusY
+            };
+            canvas.classList.add("is-dragging");
+            canvas.setPointerCapture(event.pointerId);
+        });
+        canvas.addEventListener("pointermove", function (event) {
+            if (!cropper.drag || cropper.drag.pointerId !== event.pointerId) return;
+            const rect = canvas.getBoundingClientRect();
+            if (!rect.width || !rect.height) return;
+            cropper.focusX = Math.max(0, Math.min(1, cropper.drag.focusX - (event.clientX - cropper.drag.x) / rect.width));
+            cropper.focusY = Math.max(0, Math.min(1, cropper.drag.focusY - (event.clientY - cropper.drag.y) / rect.height));
+            cropper.dirty = true;
+            drawCrop();
+        });
+        function stopDragging() {
+            cropper.drag = null;
+            canvas.classList.remove("is-dragging");
+        }
+        canvas.addEventListener("pointerup", stopDragging);
+        canvas.addEventListener("pointercancel", stopDragging);
+    }
+
+    function exportCrop() {
+        const crop = getCropRect();
+        const scale = Math.min(1, 1200 / Math.max(crop.width, crop.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(crop.width * scale));
+        canvas.height = Math.max(1, Math.round(crop.height * scale));
+        const context = canvas.getContext("2d");
+        if (!context) return "";
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(
+            cropper.image,
+            crop.x, crop.y, crop.width, crop.height,
+            0, 0, canvas.width, canvas.height
+        );
+        return canvas.toDataURL("image/jpeg", 0.8);
+    }
+
+    function clearCropper() {
+        cropper.loadId++;
+        if (cropper.objectUrl) URL.revokeObjectURL(cropper.objectUrl);
+        cropper.image = null;
+        cropper.canvas = null;
+        cropper.zoom = 1;
+        cropper.focusX = 0.5;
+        cropper.focusY = 0.5;
+        cropper.dirty = false;
+        cropper.loading = false;
+        cropper.objectUrl = "";
+        cropper.drag = null;
+        $("bannerZoom").value = "1";
+        $("bannerCropControls").classList.add("d-none");
+    }
+
+    function loadCropSource(source, changed, fail, objectUrl) {
+        const loadId = ++cropper.loadId;
+        cropper.loading = true;
+        const image = new Image();
+        image.onload = function () {
+            if (loadId !== cropper.loadId) {
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
+                return;
+            }
+            if (cropper.objectUrl) URL.revokeObjectURL(cropper.objectUrl);
+            cropper.objectUrl = objectUrl || "";
+            cropper.image = image;
+            cropper.zoom = 1;
+            cropper.focusX = 0.5;
+            cropper.focusY = 0.5;
+            cropper.dirty = changed;
+            cropper.loading = false;
+            $("bannerZoom").value = "1";
+            showImage("banner");
+        };
+        image.onerror = function () {
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+            if (loadId !== cropper.loadId) return;
+            cropper.loading = false;
+            fail();
+        };
+        image.src = source;
+    }
+
+    function setupImage(kind) {
+        const cap = "Banner";
+        const input = $("ann" + cap);
+
+        input.addEventListener("change", function () {
+            const file = input.files[0];
+            imageError(kind, "");
+            if (!file) return;
+            const okType = ALLOWED_TYPES.indexOf(file.type) !== -1 && /\.(jpe?g|png|webp)$/i.test(file.name);
+            if (!okType) {
+                imageError(kind, "That file type is not supported. Please choose a JPG, JPEG, PNG or WEBP image.");
+                input.value = "";
+                return;
+            }
+            if (file.size > MAX_FILE_SIZE) {
+                imageError(kind, "That image is larger than 5 MB. Please choose a smaller one.");
+                input.value = "";
+                return;
+            }
+            const objectUrl = URL.createObjectURL(file);
+            loadCropSource(objectUrl, true, function () {
+                imageError(kind, "This image could not be read. Please try a different file.");
+                input.value = "";
+            }, objectUrl);
+        });
+
+        $("remove" + cap + "Btn").addEventListener("click", function () {
+            clearCropper();
+            images[kind] = "";
+            input.value = "";
+            imageError(kind, "");
+            showImage(kind);
+        });
+    }
+    setupImage("banner");
+
+    $("bannerZoom").addEventListener("input", function () {
+        if (!cropper.image) return;
+        cropper.zoom = Number(this.value);
+        cropper.dirty = true;
+        drawCrop();
+    });
+
+    /* ---------- form ---------- */
+    function setFooterButtons(state) {
+        editingState = state;
+        const draftBtn = $("saveDraftBtn");
+        const mainLabel = $("saveBtn").querySelector("span");
+        if (state === "Published") {
+            draftBtn.classList.add("d-none");
+            mainLabel.textContent = "Save Changes";
+        } else {
+            draftBtn.classList.remove("d-none");
+            draftBtn.querySelector("span").textContent = state === "Unpublished" ? "Save as Unpublished" : "Save as Draft";
+            mainLabel.textContent = "Publish Announcement";
+        }
+    }
+
+    function resetForm() {
+        $("announcementForm").reset();
+        $("announcementForm").querySelectorAll(".is-invalid").forEach(function (el) { el.classList.remove("is-invalid"); });
+        $("annId").value = "";
+        $("rescheduleHint").classList.add("d-none");
+        images.banner = "";
+        $("annBanner").value = "";
+        clearCropper();
+        imageError("banner", "");
+        showImage("banner");
+        Array.prototype.forEach.call($("annCenters").options, function (option) { option.selected = false; });
+        toggleOther("annVenue"); toggleOther("annOrganizer");
+    }
+
+    function openAdd() {
+        resetForm();
+        reschedulingId = null;
+        $("formModalTitle").textContent = "Add Announcement";
+        setFooterButtons("new");
+        formModal.show();
+    }
+
+    function openEdit(id, reschedule) {
+        const a = Core.find(id);
+        if (!a) return;
+        Core.closeDetails();
+        resetForm();
+        reschedulingId = reschedule ? id : null;
+        $("annId").value = a.id;
+        $("annTitle").value = a.title;
+        $("annCategory").value = a.category;
+        var centers = Array.isArray(a.centers) ? a.centers : [a.category];
+        Array.prototype.forEach.call($("annCenters").options, function (option) {
+            option.selected = centers.indexOf(option.value) !== -1 && option.value !== a.category;
+        });
+        $("annDescription").value = a.description;
+        $("annDetails").value = a.details;
+        $("annDate").value = a.date;
+        $("annStart").value = a.startTime;
+        $("annEnd").value = a.endTime;
+        setPick("annVenue", a.venue);
+        setPick("annOrganizer", a.organizer);
+        $("annContact").value = a.contact;
+        $("annNotes").value = a.notes;
+        $("annEventStatus").value = a.cancelled ? "Cancelled" : "Automatic";
+        $("annPublishDate").value = a.publishDate;
+        images.banner = a.banner;
+        if (images.banner) {
+            showImage("banner");
+            loadCropSource(images.banner, false, function () {
+                imageError("banner", "The saved banner could not be loaded for cropping.");
+            });
+        } else {
+            showImage("banner");
+        }
+        $("formModalTitle").textContent = reschedule ? "Reschedule Event" : "Edit Announcement";
+        $("rescheduleHint").classList.toggle("d-none", !reschedule);
+        setFooterButtons(a.publishState);
+        if (reschedule) $("saveBtn").querySelector("span").textContent = "Apply New Schedule";
+        // wait for the details window to close before opening this one
+        setTimeout(function () { formModal.show(); }, 250);
+    }
+
+    function validate() {
+        let firstBad = null;
+        function bad(id, message) {
+            const el = $(id);
+            el.classList.add("is-invalid");
+            if (message && el.nextElementSibling && el.nextElementSibling.classList.contains("invalid-feedback")) {
+                el.nextElementSibling.textContent = message;
+            }
+            if (!firstBad) firstBad = el;
+        }
+        $("announcementForm").querySelectorAll(".is-invalid").forEach(function (el) { el.classList.remove("is-invalid"); });
+
+        ["annTitle", "annDescription", "annDate", "annStart"].forEach(function (id) {
+            if (!$(id).value.trim()) bad(id);
+        });
+        ["annVenue", "annOrganizer"].forEach(function (id) {
+            if (!$(id).value) bad(id);
+            else if ($(id).value === "Other" && !$(id + "Other").value.trim()) bad(id + "Other");
+        });
+        if ($("annEnd").value && $("annStart").value && $("annEnd").value <= $("annStart").value) bad("annEnd");
+
+        if (firstBad) {
+            Core.toast("Please complete the required fields before saving.");
+            firstBad.scrollIntoView({ block: "center", behavior: "smooth" });
+            firstBad.focus({ preventScroll: true });
+        }
+        return !firstBad;
+    }
+
+    // target = "Draft", "Published" or "Unpublished"
+    function saveAnnouncement(target) {
+        if (cropper.loading) {
+            Core.toast("Please wait for the banner image to finish loading.");
+            return;
+        }
+        if (!validate()) return;
+        if (cropper.dirty && cropper.image) {
+            try {
+                const croppedBanner = exportCrop();
+                if (!croppedBanner) throw new Error("Banner crop could not be exported.");
+                images.banner = croppedBanner;
+            } catch (error) {
+                imageError("banner", "The banner crop could not be saved. Please try another image.");
+                Core.toast("The banner crop could not be saved.");
+                return;
+            }
+        }
+        const data = {
+            title: $("annTitle").value.trim(),
+            category: $("annCategory").value,
+            centers: Array.from($("annCenters").selectedOptions).map(function (option) { return option.value; }),
+            description: $("annDescription").value.trim(),
+            details: $("annDetails").value.trim(),
+            date: $("annDate").value,
+            startTime: $("annStart").value,
+            endTime: $("annEnd").value,
+            venue: getPick("annVenue"),
+            organizer: getPick("annOrganizer"),
+            contact: $("annContact").value.trim(),
+            notes: $("annNotes").value.trim(),
+            banner: images.banner,
+            cancelled: $("annEventStatus").value === "Cancelled",
+            publishDate: $("annPublishDate").value
+        };
+        data.centers.unshift(data.category);
+        data.centers = Core.categories.filter(function (center) { return data.centers.indexOf(center) !== -1; });
+        if (target === "Published" && !data.publishDate) data.publishDate = Core.todayISO();
+
+        const now = new Date().toISOString();
+        const id = $("annId").value;
+        const list = Core.data;
+        let message;
+
+        if (id) {
+            const a = Core.find(id);
+            if (!a) return;
+            const scheduleChanged = a.date !== data.date || a.startTime !== data.startTime || a.endTime !== data.endTime;
+            if (reschedulingId === id && !scheduleChanged) {
+                Core.toast("Choose a different date or time to reschedule this event.");
+                return;
+            }
+            if (scheduleChanged) {
+                a.rescheduleHistory = Array.isArray(a.rescheduleHistory) ? a.rescheduleHistory : [];
+                a.rescheduleHistory.push({
+                    date: a.date,
+                    startTime: a.startTime || "",
+                    endTime: a.endTime || "",
+                    changedAt: now
+                });
+            }
+            Object.assign(a, data);
+            a.publishState = target;
+            a.updatedAt = now;
+            message = scheduleChanged
+                ? "Event rescheduled. The previous schedule is saved."
+                : (target === "Published" ? "Announcement saved." : "Announcement saved as " + target.toLowerCase() + ".");
+        } else {
+            data.id = "ann-" + Date.now();
+            data.publishState = target;
+            data.createdAt = now;
+            data.updatedAt = now;
+            data.rescheduleHistory = [];
+            list.push(data);
+            message = target === "Published" ? "Announcement published." : "Announcement saved as a draft.";
+        }
+
+        if (!Core.save()) return;
+        clearCropper();
+        reschedulingId = null;
+        formModal.hide();
+        Core.render();
+        Core.toast(message);
+    }
+
+    $("announcementForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        saveAnnouncement("Published");              // Publish Announcement / Save Changes
+    });
+    $("saveDraftBtn").addEventListener("click", function () {
+        saveAnnouncement(editingState === "Unpublished" ? "Unpublished" : "Draft");
+    });
+    $("openAddBtn").addEventListener("click", openAdd);
+
+    /* ---------- confirm window ---------- */
+    function ask(options, action) {
+        $("confirmIcon").innerHTML = '<i class="bi ' + options.icon + '"></i>';
+        $("confirmIcon").style.color = options.danger ? "#dc3545" : "#212529";
+        $("confirmTitle").textContent = options.title;
+        $("confirmName").textContent = options.name || "";
+        $("confirmText").textContent = options.text;
+        $("confirmBackBtn").textContent = options.back || "Cancel";
+        const ok = $("confirmOkBtn");
+        ok.textContent = options.ok;
+        ok.className = "btn px-4 fw-bold " + (options.danger ? "btn-danger" : "btn-success");
+        onConfirm = action;
+        confirmModal.show();
+    }
+    $("confirmOkBtn").addEventListener("click", function () {
+        const run = onConfirm;
+        onConfirm = null;
+        confirmModal.hide();
+        if (run) run();
+    });
+
+    /* ---------- card buttons ---------- */
+    Core.actions.edit = openEdit;
+    Core.actions.reschedule = function (id) { openEdit(id, true); };
+
+    Core.actions.delete = function (id) {
+        const a = Core.find(id);
+        if (!a) return;
+        Core.closeDetails();
+        ask({ icon: "bi-trash3", danger: true, title: "Delete Announcement?", name: a.title,
+              text: "This action cannot be undone.", ok: "Delete" }, function () {
+            const list = Core.data;
+            list.splice(list.indexOf(a), 1);
+            if (Core.save()) { Core.render(); Core.toast("Announcement deleted."); }
+        });
+    };
+
+    Core.actions.togglePublish = function (id) {
+        const a = Core.find(id);
+        if (!a) return;
+        Core.closeDetails();
+        if (a.publishState === "Published") {
+            ask({ icon: "bi-eye-slash", title: "Unpublish Announcement?", name: a.title,
+                  text: "It will no longer be visible on the public page. You can publish it again anytime.", ok: "Unpublish" }, function () {
+                a.publishState = "Unpublished";
+                a.updatedAt = new Date().toISOString();
+                if (Core.save()) { Core.render(); Core.toast("Announcement unpublished."); }
+            });
+        } else {
+            a.publishState = "Published";
+            if (!a.publishDate) a.publishDate = Core.todayISO();
+            a.updatedAt = new Date().toISOString();
+            if (Core.save()) {
+                Core.render();
+                Core.toast(a.publishDate > Core.todayISO() ? "Scheduled for " + a.publishDate + "." : "Announcement published.");
+            }
+        }
+    };
+
+    Core.actions.toggleCancel = function (id) {
+        const a = Core.find(id);
+        if (!a) return;
+        Core.closeDetails();
+        if (a.cancelled) {
+            a.cancelled = false;
+            a.updatedAt = new Date().toISOString();
+            if (Core.save()) { Core.render(); Core.toast("Event restored. Its status follows the schedule again."); }
+        } else {
+            ask({ icon: "bi-x-octagon", danger: true, title: "Cancel this event?", name: a.title,
+                  text: "It will stay visible and be marked Cancelled. You can restore it later.", ok: "Cancel Event", back: "Keep Event" }, function () {
+                a.cancelled = true;
+                a.updatedAt = new Date().toISOString();
+                if (Core.save()) { Core.render(); Core.toast("Event cancelled."); }
+            });
+        }
+    };
+
+})();
+</script>
+
+<!-- Event sign-up; bump the query when this script changes to avoid stale browser copies. -->
+<script src="event-register.js?v=7"></script>
+
+</body>
+</html>
